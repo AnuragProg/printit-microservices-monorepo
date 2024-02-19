@@ -1,0 +1,9 @@
+async-timeout==4.0.3
+asyncpg==0.29.0
+bcrypt==4.1.2
+grpcio==1.60.1
+grpcio-tools==1.60.1
+protobuf==4.25.3
+redis==5.0.1
+typing_extensions==4.9.0
+tzdata==2024.1

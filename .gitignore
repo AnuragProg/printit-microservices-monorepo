@@ -1,4 +1,10 @@
+
+# authentication & pricing services junk
 Lib/
 Scripts/
 pyvenv.cfg
 __pycache__/
+proto_gen/
+
+# development junk
+docker/

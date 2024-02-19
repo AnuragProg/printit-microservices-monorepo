@@ -1,0 +1,6 @@
+version: '3'
+
+
+tasks:
+  users-psql:
+    - docker run -e POSTGRES_PASSWORD=root -e POSTGRESS_DB=users postgres

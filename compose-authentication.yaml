@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  postgres:
+    restart: always
+    image: postgres:16.2
+    volumes:
+      - ./docker/authentication/pg:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: users
+    networks:
+      - default
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.authentication
+    networks:
+      - default
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./authentication
+          target: /usr/app/authentication
+          ignore:
+            - Lib/
+            - Scripts/
+            - pyvenv.cfg
+
+networks:
+  default: {}
