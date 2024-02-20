@@ -8,7 +8,7 @@ def hash(pw: str):
     salt = bcrypt.gensalt(rounds=ROUNDS)
     pw_b = bytes(pw, 'utf-8')
     hash = bcrypt.hashpw(pw_b, salt)
-    return hash
+    return hash.decode('utf-8')
 
 
 def compare(pw: str, hash: str):

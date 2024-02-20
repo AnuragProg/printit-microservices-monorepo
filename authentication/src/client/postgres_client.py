@@ -1,6 +1,5 @@
 import asyncpg
 
-
 class PostgresClient:
     def __init__(self):
         self.pool = None
@@ -12,6 +11,7 @@ class PostgresClient:
             database="users",
             host="localhost"
         )
+        print('Connected to Postgres')
 
     async def execute(self, query, *args):
         if not self.pool:

@@ -1,6 +1,5 @@
 import redis
 
-
 CONNECTION_TIMEOUT = 60 # secs
 
 class RedisClient:
@@ -13,6 +12,7 @@ class RedisClient:
             db=0
         )
         self.client = redis.Redis(connection_pool=self.pool)
+        print('Connected to Redis')
 
     async def set(
         self,
