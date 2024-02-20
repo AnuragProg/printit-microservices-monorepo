@@ -3,4 +3,6 @@ version: '3'
 
 tasks:
   users-psql:
-    - docker run -e POSTGRES_PASSWORD=root -e POSTGRESS_DB=users postgres
+    - docker run -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=users -p 5432:5432 postgres
+  users-redis:
+    - docker run -p 6379:6379 redis
