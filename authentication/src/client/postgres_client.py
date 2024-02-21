@@ -22,7 +22,7 @@ class PostgresClient:
         async with self.pool.acquire() as conn:
             if len(args)==0:
                 return await conn.fetch(query)
-            return await conn.fetch(query, args)
+            return await conn.fetch(query, *args)
 
 
     async def execute(self, query, *args):

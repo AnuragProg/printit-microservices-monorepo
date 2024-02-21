@@ -16,10 +16,10 @@ async def main():
 
     # setting up db and cache clients
     pg_client = PostgresClient()
-    #event_loop.run_until_complete(pg_client.connect())
     await pg_client.connect()
     redis_client = RedisClient()
     user_model = UserModel(pg_client, redis_client)
+    await user_model.create_table()
 
     # setting up routers
     user_router = UserRouter(user_model)

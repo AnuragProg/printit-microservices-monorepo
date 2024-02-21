@@ -1,4 +1,3 @@
-import uuid
 import asyncio
 from typing import Literal
 from fastapi import APIRouter, HTTPException
@@ -6,6 +5,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from src.errors.not_found import NotFound
 from src.model.user import UserModel, UserType, Purpose
+from src.util.jwt_generator import generate_jwt
 from src.util.otp_generator import generate_otp
 from src.client.otp_service import send_otp
 
@@ -33,6 +33,9 @@ class SignUpDetails(BaseModel):
     password: str
     user_type: Literal['customer', 'shopkeeper']
 
+class ForgotPasswordDetails(BaseModel):
+    email: str
+    new_password: str
 
 class UserRouter:
     def __init__(self, user_model: UserModel):
@@ -50,8 +53,8 @@ class UserRouter:
             return await self.signup(signup_details)
 
         @self.router.post('/forgot-password')
-        async def forgot_password():
-            return await self.forgot_password()
+        async def forgot_password(fpd: ForgotPasswordDetails):
+            return await self.forgot_password(fpd)
 
         @self.router.post('/verify-otp/{otp}')
         async def verify_otp(otp: int):
@@ -65,12 +68,23 @@ class UserRouter:
                 login_details.email,
                 login_details.password
             )
-            # user exists, create new jwt token
-            return {'user': user}
+            token = generate_jwt(
+                _id=user._id
+            )
+            return JSONResponse(
+                content={
+                    'message': 'Logged in successfully',
+                    'token': token
+                },
+                status_code=200
+            )
         except NotFound:
-            return {
-                'message': 'User not found'
-            }
+            return JSONResponse(
+                content={
+                    'message': 'User not found'
+                },
+                status_code=404
+            )
         except Exception as e:
             print(e)
             return JSONResponse(
@@ -83,21 +97,34 @@ class UserRouter:
     async def signup(self, signup_details: SignUpDetails):
         try:
             try:
+
+                # Check whether user exists
                 await self.user_model.get_user_from_db(
                     email   =signup_details.email,
                     password=signup_details.password
                 )
+                return JSONResponse(
+                    content={
+                        'message': 'User already exists'
+                    },
+                    status_code=400
+                )
             except NotFound:
+
+                # generate otp
                 otp = generate_otp(OTP_LEN)
-                await self.user_model.cache(
+
+                # cache user details
+                await self.user_model.cache_for_signup(
                     key=str(otp),
                     ttl=OTP_TTL,
                     name=signup_details.name,
                     email=signup_details.email,
                     password=signup_details.password,
                     user_type=UserType.get(signup_details.user_type),
-                    purpose=Purpose.SIGNUP
                 )
+
+                # send otp
                 await send_otp(otp, signup_details.email)
                 return {
                     'message': 'OTP sent successfully'
@@ -111,9 +138,42 @@ class UserRouter:
                 status_code=500
             )
 
-    async def forgot_password(self):
+    async def forgot_password(self, fpd: ForgotPasswordDetails):
         try:
-            pass
+
+            # check whether user exists
+            await self.user_model.get_user_from_db(
+                email=fpd.email,
+                password=None
+            )
+
+            # generate otp
+            otp = generate_otp(OTP_LEN)
+
+            # cache user's details
+            await self.user_model.cache_for_forgot_password(
+                key=str(otp),
+                ttl=OTP_TTL,
+                email=fpd.email,
+                new_password=fpd.new_password
+            )
+
+            # send otp
+            await send_otp(otp, fpd.email)
+
+            return JSONResponse(
+                content={
+                    'message': 'OTP sent successfully'
+                },
+                status_code=200
+            )
+        except NotFound:
+            return JSONResponse(
+                content={
+                    'message': 'User not found'
+                },
+                status_code=404
+            )
         except Exception as e:
             print(e)
             return JSONResponse(
@@ -125,18 +185,21 @@ class UserRouter:
 
     async def verify_otp(self, otp: int):
         try:
+
+            # retrieve user details and delete it from cache
             info = await self.user_model.get_otp_info(str(otp))
+            await self.user_model.del_otp_info(str(otp))
 
             if info['purpose'] == Purpose.SIGNUP.value:
-                await asyncio.gather(
-                    self.user_model.del_otp_info(str(otp)),
-                    self.user_model.save(
-                        name=info['name'],
-                        email=info['email'],
-                        password=info['password'],
-                        user_type=UserType.get(info['user_type'])
-                    )
+
+                # save user details
+                await self.user_model.save(
+                    name=info['name'],
+                    email=info['email'],
+                    password=info['password'],
+                    user_type=UserType.get(info['user_type'])
                 )
+
                 return JSONResponse(
                     content={
                         'message': 'User successfully signed up'
@@ -144,16 +207,21 @@ class UserRouter:
                     status_code=200
                 )
             elif info['purpose'] == Purpose.FORGOT_PASSWORD.value:
-                pass
-            else:
-                raise Exception('invalid purpose')
 
-            return JSONResponse(
-                content={
-                    'message': 'everthing is ok'
-                },
-                status_code=200
-            )
+                # update password
+                await self.user_model.update_password(
+                    email=info['email'],
+                    new_password=info['new_password']
+                )
+
+                return JSONResponse(
+                    content={
+                        'message': 'Password updated successfully'
+                    },
+                    status_code=200
+                )
+            print(f"Found invalid purpose {info['purpose']}")
+            raise Exception('Invalid purpose')
         except Exception as e:
             print(e)
             return JSONResponse(

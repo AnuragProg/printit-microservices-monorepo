@@ -8,6 +8,9 @@ from src.util.secure_password_hasher import hash, compare
 
 
 class User:
+    '''
+    For providing types to objects returned from sql driver
+    '''
     def __init__(self, _id: str, name: str, email: str, user_type: str):
         self._id = _id
         self.name = name
@@ -55,17 +58,25 @@ class UserModel:
     async def get_user_from_db(
         self,
         email: str,
-        password: str
+        password: str | None
     ):
         try:
-            password = hash(password)
+            # fetch user
             res = await self.pg_client.fetch(
                 '''
-                SELECT * FROM users WHERE email=$1 AND password=$2 LIMIT 1;
+                SELECT * FROM users WHERE email = $1;
                 '''
-            , email, password)
+            , email)
+
+            # parse user details
             row = res[0]
-            return User(row['_id'], row['name'], row['email'], row['user_type'])
+            user = User(row['_id'].hex, row['name'], row['email'], row['user_type'])
+
+            # check for password compliance (when needed)
+            if password is not None and not compare(password, row['password']):
+                raise NotFound()
+
+            return user
         except Exception:
             raise NotFound()
 
@@ -73,7 +84,7 @@ class UserModel:
         self,
         name: str,
         email: str,
-        password: str,
+        password: str, # should be hashed(best practice to hash then cache, after which this func will be called)
         user_type: UserType
     ):
         '''
@@ -94,10 +105,27 @@ class UserModel:
             )
             VALUES($1, $2, $3, $4, $5);
             '''
-        , _id, name, email, password, user_type.name)
+        , _id, name, email, password, user_type.value)
 
+    async def cache_for_forgot_password(
+        self,
+        key: str,
+        ttl: int,
+        email: str,
+        new_password: str
+    ):
+        '''
+        Saves user data in cache for forgot password
+        '''
+        new_password = hash(new_password)
+        val = json.dumps({
+            'email': email,
+            'new_password': new_password,
+            'purpose': Purpose.FORGOT_PASSWORD.value
+        })
+        await self.redis_client.set(key, ttl, val)
 
-    async def cache(
+    async def cache_for_signup(
         self,
         key: str,
         ttl: int,
@@ -105,7 +133,6 @@ class UserModel:
         email: str,
         password: str,
         user_type: UserType,
-        purpose: Purpose
     ):
         '''
         Saves user data in Cache
@@ -116,16 +143,38 @@ class UserModel:
             'email': email,
             'password': password,
             'user_type': user_type.value,
-            'purpose': purpose.value
+            'purpose': Purpose.SIGNUP.value
         })
         await self.redis_client.set(key, ttl, val)
 
+    async def update_password(
+        self,
+        email: str,
+        new_password: str
+    ):
+        '''
+        email - will be used to identify which user's password to be changed
+        new_password(hashed) - will be set for user's password
+        '''
+        await self.pg_client.execute(
+            '''
+            UPDATE users SET password = $1 WHERE email = $2;
+            '''
+        , new_password, email)
 
     async def get_otp_info(self, key: str):
+        '''
+        Retrieves cached otp info cached against otp key
+        '''
+
+        # get otp info
         val = await self.redis_client.get(key)
         if val is None:
             raise NotFound()
+
+        # parse
         val_str = json.loads(val)
+
         return val_str
 
     async def del_otp_info(self, key: str):
