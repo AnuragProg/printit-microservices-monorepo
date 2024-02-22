@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+
+message Token{
+	string token = 1;
+}
+
+
+message User{
+	string _id = 1;
+	string name = 2;
+	string email = 3;
+	string user_type = 4;
+}
+
+
+service Authentication{
+	rpc VerifyToken(Token) returns (User);
+}

@@ -1,5 +1,8 @@
 from typing import Union
+import os
 import asyncpg
+
+PG_HOST = os.getenv('PG_HOST', 'localhost')
 
 class PostgresClient:
     def __init__(self):

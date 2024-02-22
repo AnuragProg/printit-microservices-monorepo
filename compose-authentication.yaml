@@ -1,6 +1,14 @@
 version: '3'
 
 services:
+  redis:
+    restart: always
+    image: redis:7.2.4
+    volumes:
+      - ./docker/authentication/redis:/data
+    networks:
+      - default
+
   postgres:
     restart: always
     image: postgres:16.2
@@ -12,21 +20,15 @@ services:
       POSTGRES_DB: users
     networks:
       - default
+
   app:
     build:
       context: .
       dockerfile: Dockerfile.authentication
+    ports:
+      - "3000:3000"
     networks:
       - default
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./authentication
-          target: /usr/app/authentication
-          ignore:
-            - Lib/
-            - Scripts/
-            - pyvenv.cfg
 
 networks:
   default: {}

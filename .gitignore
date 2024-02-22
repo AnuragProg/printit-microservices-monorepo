@@ -4,7 +4,9 @@ Lib/
 Scripts/
 pyvenv.cfg
 __pycache__/
-proto_gen/
+**/proto_gen/**
+
+!**/proto_gen/__init__.py
 
 # development junk
 docker/

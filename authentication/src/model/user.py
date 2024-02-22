@@ -55,6 +55,23 @@ class UserModel:
             '''
         )
 
+    async def get_user_from_db_by_id(self, id: str):
+        try:
+            # fetch user
+            row = (await self.pg_client.fetch(
+                '''
+                SELECT * FROM users WHERE _id = $1;
+                '''
+            , id))[0]
+
+            # parse user details
+            user = User(row['_id'].hex, row['name'], row['email'], row['user_type'])
+
+            return user
+
+        except Exception:
+            raise NotFound()
+
     async def get_user_from_db(
         self,
         email: str,
