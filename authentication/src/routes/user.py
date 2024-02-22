@@ -1,13 +1,12 @@
-import asyncio
 from typing import Literal
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from src.errors.not_found import NotFound
-from src.model.user import UserModel, UserType, Purpose
-from src.util.jwt_generator import generate_jwt
-from src.util.otp_generator import generate_otp
-from src.client.otp_service import send_otp
+from errors.not_found import NotFound
+from model.user import UserModel, UserType, Purpose
+from util.jwt_generator import generate_jwt
+from util.otp_generator import generate_otp
+from client.otp_service import send_otp
 
 
 router = APIRouter()

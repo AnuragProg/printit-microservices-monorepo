@@ -13,7 +13,7 @@ class PostgresClient:
             user="root",
             password="root",
             database="users",
-            host="localhost",
+            host=PG_HOST,
             max_size=100
         )
         print('Connected to Postgres')

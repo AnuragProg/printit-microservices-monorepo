@@ -1,10 +1,10 @@
 import uuid
 import json
 from enum import Enum
-from src.errors.not_found import NotFound
-from src.client.postgres_client import PostgresClient
-from src.client.redis_client import RedisClient
-from src.util.secure_password_hasher import hash, compare
+from errors.not_found import NotFound
+from client.postgres_client import PostgresClient
+from client.redis_client import RedisClient
+from util.secure_password_hasher import hash, compare
 
 
 class User:

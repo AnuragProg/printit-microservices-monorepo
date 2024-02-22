@@ -1,11 +1,14 @@
+import os
 import redis.asyncio as redis
 
 CONNECTION_TIMEOUT = 60 # secs
 
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost/0')
+
 class RedisClient:
     def __init__(self):
         self.pool = redis.BlockingConnectionPool.from_url(
-            'redis://localhost/0',
+            REDIS_URL,
             max_connections=110,
             timeout=30
         )

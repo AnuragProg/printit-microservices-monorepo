@@ -1,9 +1,9 @@
 import grpc
-from src.proto_gen.auth_pb2_grpc import AuthenticationServicer
-from src.proto_gen.auth_pb2 import Token, User
+from proto_gen.auth_pb2_grpc import AuthenticationServicer
+from proto_gen.auth_pb2 import Token, User
 from grpc.aio import ServicerContext
-from src.util.jwt_generator import decode_jwt
-from src.model.user import UserModel
+from util.jwt_generator import decode_jwt
+from model.user import UserModel
 
 
 class AuthenticationService(AuthenticationServicer):

@@ -2,16 +2,17 @@ import os
 import asyncio
 import uvicorn
 import grpc.aio
-from src.model.user import UserModel
-from src.client.postgres_client import PostgresClient
-from src.client.redis_client import RedisClient
+from model.user import UserModel
+from client.postgres_client import PostgresClient
+from client.redis_client import RedisClient
 from fastapi import FastAPI
-from src.routes.user import UserRouter
-from src.proto_gen.auth_pb2_grpc import add_AuthenticationServicer_to_server
-from src.services.authentication import AuthenticationService
+from routes.user import UserRouter
+from proto_gen.auth_pb2_grpc import add_AuthenticationServicer_to_server
+from services.authentication import AuthenticationService
 
 REST_HOST = os.getenv('REST_HOST', 'localhost')
 REST_PORT = int(os.getenv('REST_PORT', '3000'))
+GRPC_ADDR = os.getenv('GRPC_ADDR', '[::]:50051')
 
 
 async def main():
@@ -31,7 +32,7 @@ async def main():
 
     # grpc app
     grpc_app = grpc.aio.server()
-    grpc_app.add_insecure_port('[::]:50051')
+    grpc_app.add_insecure_port(GRPC_ADDR)
     add_AuthenticationServicer_to_server(AuthenticationService(user_model), grpc_app)
 
 
