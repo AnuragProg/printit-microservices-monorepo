@@ -25,8 +25,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.authentication
+    environment:
+      - REST_HOST=0.0.0.0
+      - REST_PORT=3000
+      - GRPC_ADDR=0.0.0.0:50051
+      - PG_HOST=postgres
+      - REDIS_URL=redis://redis/0
     ports:
       - "3000:3000"
+      - "50051:50051"
     networks:
       - default
 

@@ -4,16 +4,16 @@ FROM python:3.11-alpine
 WORKDIR /usr/app/authentication
 
 # copy requirements file
-COPY ./authentication/requirements.txt ./
+COPY ./authentication/requirements.txt .
 
 # install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy proto definitions
-COPY /proto_def ../proto_def
+COPY ./proto_def ../proto_def
 
 # copying rest of the files
-COPY ./authentication/ .
+COPY ./authentication .
 
 # generate proto files
 RUN mkdir -p proto_gen
