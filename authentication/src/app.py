@@ -53,8 +53,16 @@ async def main():
     await server.serve()
     print('REST server stopped!')
 
-    await grpc_app.stop(None)
-    print('GRPC server stopped!')
+    # gracefully close all services
+    async def close_grpc():
+        await grpc_app.stop(None)
+        print('GRPC server stopped!')
+
+    await asyncio.gather(
+        close_grpc(),
+        redis_client.close(),
+        pg_client.close()
+    )
 
 
 if __name__ == "__main__":

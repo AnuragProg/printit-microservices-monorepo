@@ -8,3 +8,5 @@ tasks:
     - docker run -p 6379:6379 redis
   auth-proto-gen:
     - python -m grpc_tools.protoc --proto_path=./proto_def/authentication --python_out=./authentication/src/proto_gen --pyi_out=./authentication/src/proto_gen --grpc_python_out=./authentication/src/proto_gen auth.proto
+  file-proto-gen:
+    - protoc --go_out=./file/internal/proto_gen/authentication --go_opt=paths=source_relative --go-grpc_out=./file/internal/proto_gen/authentication --go-grpc_opt=paths=source_relative --proto_path=./proto_def/authentication ./proto_def/authentication/auth.proto

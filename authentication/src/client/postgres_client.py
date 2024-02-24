@@ -8,6 +8,13 @@ class PostgresClient:
     def __init__(self):
         self.pool: Union[asyncpg.Pool, None] = None
 
+    async def close(self):
+        if self.pool is None:
+            return
+        print('Closing Postgres pool...')
+        await self.pool.close()
+        print('Closed Postgres pool...')
+
     async def connect(self):
         self.pool = await asyncpg.create_pool(
             user="root",

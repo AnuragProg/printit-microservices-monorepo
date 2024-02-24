@@ -17,7 +17,8 @@ COPY ./authentication .
 
 # generate proto files
 RUN mkdir -p proto_gen
+RUN python -m grpc_tools.protoc --proto_path=../proto_def/authentication --python_out=./src/proto_gen --pyi_out=./src/proto_gen --grpc_python_out=./src/proto_gen auth.proto
 
 # refreshing proto stubs and running the application
-CMD python -m grpc_tools.protoc --proto_path=../proto_def/authentication --python_out=./src/proto_gen --pyi_out=./src/proto_gen --grpc_python_out=./src/proto_gen auth.proto && python -u ./src/app.py
+CMD python -u ./src/app.py
 

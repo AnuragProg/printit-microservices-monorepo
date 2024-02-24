@@ -14,6 +14,11 @@ class RedisClient:
         )
         print('Connected to Redis')
 
+    async def close(self):
+        print('Closing Redis pool...')
+        await self.pool.disconnect()
+        print('Closed Redis pool...')
+
     async def set(
         self,
         key: str,
