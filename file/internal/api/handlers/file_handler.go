@@ -1,8 +1,21 @@
 package handlers
 
-import "github.com/gofiber/fiber/v2"
+import (
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+)
 
 
-func Foo(c *fiber.Ctx) error {
-	return c.SendString("world")
+func UploadFile(c *fiber.Ctx) error {
+	form, err := c.MultipartForm()
+	if err != nil{
+		return err
+	}
+
+	file := form.File["file"][0]
+
+	log.Info(file.Header.Get("content-type"), " received")
+
+	return c.SendString("It's ok")
 }

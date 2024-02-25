@@ -20,7 +20,9 @@ import (
 func main(){
 
 	// Setup rest app
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		BodyLimit: 10 * 1024 * 1024,
+	})
 
 	// connect to mongo database
 	mongo_ctx, mongo_ctx_cancel := context.WithCancel(context.Background())
