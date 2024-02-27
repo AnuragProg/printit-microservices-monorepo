@@ -8,18 +8,13 @@ import (
 	handler "github.com/AnuragProg/printit-microservices-monorepo/file/internal/api/handlers"
 	mid "github.com/AnuragProg/printit-microservices-monorepo/file/internal/middleware"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
-	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
 )
 
 
 type FileRoute struct{
 	Router *fiber.Router
-
 	MinioClient *minio.Client
-
-	MongoDB *mongo.Database
-	MongoClient *mongo.Client
-
+	MongoFileMetadataCol *mongo.Collection
 	AuthGrpcClient *auth.AuthenticationClient
 }
 
@@ -38,8 +33,7 @@ func (fr *FileRoute)SetupRoutes(){
 		),
 		handler.GetUploadFileHandler(
 			fr.MinioClient,
-			fr.MongoClient,
-			fr.MongoDB.Collection(consts.FILE_METADATA_COL),
+			fr.MongoFileMetadataCol,
 		),
 	)
 }

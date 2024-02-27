@@ -3,26 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"net/http"
 	"os"
-	"time"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
-
+	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
 	route "github.com/AnuragProg/printit-microservices-monorepo/file/internal/api/routes"
+	client "github.com/AnuragProg/printit-microservices-monorepo/file/internal/client"
 	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
 	utils "github.com/AnuragProg/printit-microservices-monorepo/file/pkg/utils"
-	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
 )
 
 var (
@@ -37,64 +27,44 @@ var (
 
 func main(){
 
+	// connect to mongo database
+	mongoClient, mongoDB, err := client.GetMongoClientAndDB(MONGO_URI)
+	if err != nil{
+		panic(err.Error())
+	}
+	defer mongoClient.Disconnect(context.Background())
+	mongoFileMetadataCol := mongoDB.Collection(consts.FILE_METADATA_COL)
+
+	// connect to minio client
+	minioClient, err := client.GetMinioClient(MINIO_URI, MINIO_SERVER_ACCESS_KEY, MINIO_SERVER_SECRET_KEY)
+	if err != nil{
+		panic(err.Error())
+	}
+
+	// connect to grpc servers
+	authGrpcConn, err := client.GetAuthGrpcConnAndClient(AUTH_GRPC_URI)
+	if err != nil{
+		panic(err.Error())
+	}
+	defer authGrpcConn.Close()
+	authGrpcClient := auth.NewAuthenticationClient(authGrpcConn)
+
 	// Setup rest app
 	restApp := fiber.New(fiber.Config{
 		BodyLimit: 10 * 1024 * 1024, // 10 MB
 	})
 
-	// connect to mongo database
-	mongoCtx, mongoCtxCancel := context.WithCancel(context.Background())
-	defer mongoCtxCancel()
-	mongoClient, err := mongo.Connect(mongoCtx, options.Client().ApplyURI(MONGO_URI))
-	if err != nil{
-		panic(err.Error())
-	}
-	mongoDB := mongoClient.Database(consts.FILE_METADATA_DB)
-	mongoDB.CreateCollection(context.Background(), consts.FILE_METADATA_COL)
-	log.Println("Connected to Mongo...")
-
-
-	// connect to minio client
-	minioClient, err := minio.New(MINIO_URI, &minio.Options{
-		Creds: credentials.NewStaticV4(MINIO_SERVER_ACCESS_KEY, MINIO_SERVER_SECRET_KEY, ""),
-		Transport: &http.Transport{
-			MaxIdleConns: 100,
-			IdleConnTimeout: 60*time.Second,
-		},
-	})
-	if err != nil{
-		panic(err.Error())
-	}
-	minioClient.MakeBucket(context.Background(), consts.FILE_BUCKET, minio.MakeBucketOptions{})
-	log.Println("Connected to Minio...")
-
-	// connect to grpc servers
-	authGrpcConn, err := grpc.Dial(AUTH_GRPC_URI, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil{
-		panic(err.Error())
-	}
-	defer authGrpcConn.Close()
-	log.Println("Connected to Auth GRPC server...")
-
-	// create grpc client
-	authGrpcClient := auth.NewAuthenticationClient(authGrpcConn)
-
 	// setup top level routes
 	fileRouter := restApp.Group("/file")
 	fileRoute := route.FileRoute{
 		Router: &fileRouter,
-
 		MinioClient: minioClient,
-
-		MongoDB: mongoClient.Database(consts.FILE_METADATA_DB),
-		MongoClient: mongoClient,
-
+		MongoFileMetadataCol: mongoFileMetadataCol,
 		AuthGrpcClient: &authGrpcClient,
 	}
 	fileRoute.SetupRoutes()
 
-
 	// start rest server
-	log.Printf("Listening on :%v\n", REST_PORT)
+	log.Info("Listening on :", REST_PORT)
 	restApp.Listen(fmt.Sprintf(":%v", REST_PORT))
 }

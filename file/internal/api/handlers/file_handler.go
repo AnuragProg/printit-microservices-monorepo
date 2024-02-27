@@ -22,8 +22,7 @@ import (
 
 func GetUploadFileHandler(
 	minioClient *minio.Client,
-	mongoClient *mongo.Client,
-	fileMetadataCol *mongo.Collection,
+	mongoFileMetadataCol *mongo.Collection,
 ) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
@@ -58,7 +57,7 @@ func GetUploadFileHandler(
 		}
 
 		// save metadata
-		_, err = fileMetadataCol.InsertOne(context.Background(), metadata)
+		_, err = mongoFileMetadataCol.InsertOne(context.Background(), metadata)
 		if err != nil{
 			log.Error(err)
 			return fiber.ErrInternalServerError
@@ -69,7 +68,7 @@ func GetUploadFileHandler(
 			ContentType: metadata.ContentType,
 		})
 		if err != nil{
-			fileMetadataCol.DeleteOne(context.Background(), bson.M{
+			mongoFileMetadataCol.DeleteOne(context.Background(), bson.M{
 				"_id": metadata.Id,
 			})
 			return err
