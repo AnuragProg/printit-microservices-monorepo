@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 
+	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
 )
 
@@ -21,7 +21,6 @@ func GetAuthMiddleware(auth_grpc_client *auth.AuthenticationClient) fiber.Handle
 			return fiber.NewError(fiber.StatusBadRequest, "please provide auth token")
 		}
 		token := auth_header_slice[1]
-		log.Info("token=", token)
 
 		// verifying token
 		user, err := (*auth_grpc_client).VerifyToken(context.Background(), &auth.Token{ Token: token } )
@@ -30,7 +29,7 @@ func GetAuthMiddleware(auth_grpc_client *auth.AuthenticationClient) fiber.Handle
 		}
 
 		// pass user info forward for handlers
-		c.Locals("user", user)
+		c.Locals(consts.USER_LOCAL, user)
 
 		return c.Next()
 	}

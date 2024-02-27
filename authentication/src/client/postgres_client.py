@@ -19,7 +19,7 @@ class PostgresClient:
         self.pool = await asyncpg.create_pool(
             user="root",
             password="root",
-            database="users",
+            database="printit",
             host=PG_HOST,
             max_size=100
         )

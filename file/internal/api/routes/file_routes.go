@@ -2,17 +2,24 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/minio/minio-go/v7"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	mid "github.com/AnuragProg/printit-microservices-monorepo/file/internal/middleware"
 	handler "github.com/AnuragProg/printit-microservices-monorepo/file/internal/api/handlers"
+	mid "github.com/AnuragProg/printit-microservices-monorepo/file/internal/middleware"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
+	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
 )
 
 
 type FileRoute struct{
-	MongoClient *mongo.Client
 	Router *fiber.Router
+
+	MinioClient *minio.Client
+
+	MongoDB *mongo.Database
+	MongoClient *mongo.Client
+
 	AuthGrpcClient *auth.AuthenticationClient
 }
 
@@ -29,6 +36,10 @@ func (fr *FileRoute)SetupRoutes(){
 				"application/pdf": struct{}{},
 			},
 		),
-		handler.UploadFile,
+		handler.GetUploadFileHandler(
+			fr.MinioClient,
+			fr.MongoClient,
+			fr.MongoDB.Collection(consts.FILE_METADATA_COL),
+		),
 	)
 }

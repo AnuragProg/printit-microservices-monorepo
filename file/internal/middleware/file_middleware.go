@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 
@@ -11,6 +12,7 @@ func GetSingleFileMiddleware() fiber.Handler {
 	return func (c *fiber.Ctx) error {
 		form, err := c.MultipartForm()
 		if err != nil{
+			log.Info(err.Error())
 			return fiber.NewError(fiber.StatusBadRequest, "invalid request")
 		}
 

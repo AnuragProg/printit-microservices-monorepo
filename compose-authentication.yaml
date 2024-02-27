@@ -17,7 +17,7 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: users
+      POSTGRES_DB: printit
     networks:
       - default
 
