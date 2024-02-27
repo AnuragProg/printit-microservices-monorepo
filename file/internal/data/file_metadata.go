@@ -10,7 +10,6 @@ import (
 type FileMetadata struct{
 	Id primitive.ObjectID `bson:"_id"`
 	UserId string `bson:"user_id"`
-	FileId string `bson:"file_id"`
 	FileName string `bson:"file_name"`
 	BucketName string `bson:"bucket_name"`
 	Size uint32 `bson:"size"`

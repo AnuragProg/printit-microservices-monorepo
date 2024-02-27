@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"io"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,8 +15,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	data "github.com/AnuragProg/printit-microservices-monorepo/file/internal/data"
 	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
+	data "github.com/AnuragProg/printit-microservices-monorepo/file/internal/data"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
 )
 
@@ -43,6 +44,7 @@ func GetUploadFileHandler(
 		if err != nil{
 			return fiber.NewError(fiber.StatusBadRequest, "unable to open file")
 		}
+		defer buff.Close()
 
 		// Create file metadata object
 		metadata := data.FileMetadata{
@@ -78,5 +80,46 @@ func GetUploadFileHandler(
 		return c.JSON(map[string]string{
 			"message": "file uploaded successfully",
 		})
+	}
+}
+
+
+func GetDownloadFileHandler(
+	minioClient *minio.Client,
+	mongoFileMetadataCol *mongo.Collection,
+) fiber.Handler{
+	return func(c *fiber.Ctx) error {
+
+		// get file id
+		fileId, err := primitive.ObjectIDFromHex(c.Params("id"))
+		if err != nil{
+			return fiber.NewError(fiber.StatusBadRequest, "invalid id param")
+		}
+
+
+		// get file metadata
+		metadataRes := mongoFileMetadataCol.FindOne(context.Background(), bson.M{"_id": fileId})
+		metadata := data.FileMetadata{}
+		if err := metadataRes.Decode(&metadata); err != nil{
+			return err
+		}
+
+		// get file
+		obj, err := minioClient.GetObject(context.Background(), consts.FILE_BUCKET, metadata.Id.Hex(), minio.GetObjectOptions{})
+		if err != nil{
+			return fiber.NewError(fiber.StatusNotFound, "file not found")
+		}
+		defer obj.Close()
+
+		// set response headers
+		c.Set("content-type", metadata.ContentType)
+		c.Set("content-disposition", "attachment; filename="+metadata.FileName)
+
+		// write file to response
+		if _, err = io.Copy(c.Response().BodyWriter(), obj); err != nil{
+			return fiber.ErrInternalServerError
+		}
+
+		return nil
 	}
 }

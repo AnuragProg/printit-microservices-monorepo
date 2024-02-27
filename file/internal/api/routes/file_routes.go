@@ -23,7 +23,7 @@ func (fr *FileRoute)SetupRoutes(){
 	router := fr.Router
 
 	(*router).Post(
-		"/upload",
+		"/",
 		mid.GetAuthMiddleware(fr.AuthGrpcClient),
 		mid.GetSingleFileMiddleware(),
 		mid.GetFileContentTypeCheckerMiddleware(
@@ -32,6 +32,16 @@ func (fr *FileRoute)SetupRoutes(){
 			},
 		),
 		handler.GetUploadFileHandler(
+			fr.MinioClient,
+			fr.MongoFileMetadataCol,
+		),
+	)
+
+
+	(*router).Get(
+		"/:id",
+		mid.GetAuthMiddleware(fr.AuthGrpcClient),
+		handler.GetDownloadFileHandler(
 			fr.MinioClient,
 			fr.MongoFileMetadataCol,
 		),
