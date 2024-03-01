@@ -1,1 +1,90 @@
 # main compose file for executing all services in unison
+version: '3'
+
+services:
+  # authentication services
+  auth-redis:
+    restart: always
+    image: redis:7.2.4
+    volumes:
+      - ./docker/authentication/redis:/data
+    networks:
+      - default
+
+  auth-postgres:
+    restart: always
+    image: postgres:16.2
+    volumes:
+      - ./docker/authentication/pg:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: printit
+    networks:
+      - default
+
+  auth-app:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.authentication
+    depends_on:
+      - auth-reds
+      - auth-postgres
+    environment:
+      - REST_HOST=0.0.0.0
+      - REST_PORT=3000
+      - GRPC_ADDR=0.0.0.0:50051
+      - PG_HOST=auth-postgres
+      - REDIS_URL=redis://auth-redis/0
+    ports:
+      - "3000:3000"
+      - "50051:50051"
+    networks:
+      - default
+
+  # file services
+  file-mongo:
+    restart: always
+    image: mongo:7.0
+    volumes:
+      - ./docker/file/mongo:/data/db
+    networks:
+      - default
+
+  file-minio:
+    restart: always
+    image: bitnami/minio:2024.2.26
+    volumes:
+      - ./docker/file/minio:/bitnami/minio/data
+    environment:
+      - MINIO_ROOT_USER=minio-access-key
+      - MINIO_ROOT_PASSWORD=minio-secret-key
+    networks:
+      - default
+
+  file-app:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.file
+    depends_on:
+      - auth-app
+      - file-mongo
+      - file-minio
+    environment:
+      - MONGO_URI=mongodb://file-mongo:27017/printit
+      - AUTH_GRPC_URI=auth-app:50051
+      - REST_PORT=3001
+      - MINIO_URI=file-minio:9000
+      - MINIO_SERVER_ACCESS_KEY=minio-access-key
+      - MINIO_SERVER_SECRET_KEY=minio-secret-key
+    ports:
+      - "3001:3001"
+    networks:
+      - default
+
+
+
+networks:
+  default: {}

@@ -77,8 +77,12 @@ func GetUploadFileHandler(
 		}
 
 		// respond
-		return c.JSON(map[string]string{
-			"message": "file uploaded successfully",
+		return c.JSON(struct{
+			Message string `json:"message"`
+			FileInfo data.FileMetadata `json:"file_info"`
+		}{
+			Message: "file uploaded successfully",
+			FileInfo: metadata,
 		})
 	}
 }

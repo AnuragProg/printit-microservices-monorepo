@@ -16,6 +16,7 @@ import (
 
 func GetMinioClient(minioURI, minioServerAccessKey, minioServerSecretKey string) (*minio.Client, error){
 
+	// create client
 	minioClient, err := minio.New(minioURI, &minio.Options{
 		Creds: credentials.NewStaticV4(minioServerAccessKey, minioServerSecretKey, ""),
 		Transport: &http.Transport{
@@ -24,6 +25,11 @@ func GetMinioClient(minioURI, minioServerAccessKey, minioServerSecretKey string)
 		},
 	})
 	if err != nil{
+		return nil, err
+	}
+
+	// check minio connection
+	if _, err := minioClient.ListBuckets(context.Background()); err != nil{
 		return nil, err
 	}
 

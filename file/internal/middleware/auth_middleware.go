@@ -6,6 +6,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
@@ -28,7 +30,11 @@ func GetAuthMiddleware(auth_grpc_client *auth.AuthenticationClient) fiber.Handle
 		user, err := (*auth_grpc_client).VerifyToken(context.Background(), &auth.Token{ Token: token } )
 		if err != nil{
 			log.Error(err.Error())
-			return fiber.NewError(fiber.StatusUnauthorized, "invalid token")
+			res, _ := status.FromError(err)
+			if res.Code() == codes.Unauthenticated{
+				return fiber.NewError(fiber.StatusUnauthorized, "invalid token")
+			}
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
 		// pass user info forward for handlers

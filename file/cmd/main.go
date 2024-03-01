@@ -27,6 +27,9 @@ var (
 
 func main(){
 
+	// setup grpc server for file service functionalitities
+	// TODO yet to be made
+
 	// connect to mongo database
 	mongoClient, mongoDB, err := client.GetMongoClientAndDB(MONGO_URI)
 	if err != nil{
