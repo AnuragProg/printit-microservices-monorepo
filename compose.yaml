@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: Dockerfile.authentication
     depends_on:
-      - auth-reds
+      - auth-redis
       - auth-postgres
     environment:
       - REST_HOST=0.0.0.0
