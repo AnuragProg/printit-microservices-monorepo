@@ -51,6 +51,9 @@ func main(){
 	}
 	defer authGrpcConn.Close()
 	authGrpcClient := auth.NewAuthenticationClient(authGrpcConn)
+	if _, err = authGrpcClient.HealthCheck(context.Background(), &auth.Empty{}); err != nil{
+		panic(err.Error())
+	}
 
 	// Setup rest app
 	restApp := fiber.New(fiber.Config{

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option go_package = "github.com/AnuragProg/printit-microservices-monorepo/file/internal/proto_gen/authentication";
 
-package auth;
+package auth_grpc;
 
 message Token{
 	string token = 1;
@@ -21,6 +21,9 @@ message User{
 	UserType user_type = 4;
 }
 
+message Empty{}
+
 service Authentication{
+	rpc HealthCheck(Empty) returns (Empty);
 	rpc VerifyToken(Token) returns (User);
 }

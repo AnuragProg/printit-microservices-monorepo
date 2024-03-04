@@ -1,6 +1,6 @@
 import grpc
 from proto_gen.auth_pb2_grpc import AuthenticationServicer
-from proto_gen.auth_pb2 import Token, User, UserType as GrpcUserType
+from proto_gen.auth_pb2 import Token, User, UserType as GrpcUserType, Empty
 from grpc.aio import ServicerContext
 from util.jwt_generator import decode_jwt
 from model.user import UserModel, UserType as LocalUserType
@@ -9,6 +9,9 @@ from model.user import UserModel, UserType as LocalUserType
 class AuthenticationService(AuthenticationServicer):
     def __init__(self, user_model: UserModel):
         self.user_model = user_model
+
+    async def HealthCheck(self, request: Empty, context: ServicerContext):
+        return Empty()
 
     async def VerifyToken(self, request: Token, context: ServicerContext):
         try:

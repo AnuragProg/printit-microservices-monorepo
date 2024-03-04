@@ -5,8 +5,7 @@ mod utils;
 mod client;
 
 use std::net::Ipv4Addr;
-//use api::middleware::auth_middlware::ShopkeeperAuthMiddleware; TODO figure out how to use request
-//guards to authenticate requests
+use api::middleware::auth_middlware::ShopkeeperAuthMiddleware;
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error>{
@@ -17,8 +16,8 @@ async fn main() -> Result<(), rocket::Error>{
         ..rocket::Config::default()
     };
     let rest_app = rocket::build()
-        .configure(rest_config)
-        //.attach(ShopkeeperAuthMiddleware{})
+        //.configure(rest_config)
+        .attach(ShopkeeperAuthMiddleware{})
         .launch();
 
     tokio::join!(rest_app);
