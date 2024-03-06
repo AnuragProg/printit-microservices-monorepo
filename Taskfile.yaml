@@ -2,6 +2,8 @@ version: '3'
 
 
 tasks:
+  docker:
+    - docker compose -f compose.yaml up --build
 
   # authentication server tasks
   auth-docker:

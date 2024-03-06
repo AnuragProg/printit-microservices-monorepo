@@ -6,12 +6,19 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rocket = "0.5.0"
+rocket = { version = "0.5.0", features = ["json"] }
 tonic = "0.11"
 prost = "0.12"
 tokio = { version = "1.0", features = ["full"] }
 regex = "1.10.3"
 ws = { package = "rocket_ws", version = "0.1.0" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4.34", features = ["serde"] }
+
+[dependencies.mongodb]
+version = "2.8.0"
+features = ["tokio-runtime"]
 
 [build-dependencies]
 tonic-build = "0.11"

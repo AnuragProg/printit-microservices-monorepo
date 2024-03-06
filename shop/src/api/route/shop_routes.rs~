@@ -1,0 +1,37 @@
+use rocket::State;
+use rocket::response::{content::RawJson, status::Custom};
+use rocket::{get, post, patch};
+use rocket::http::Status;
+use crate::api::guards::auth_guard::AuthUser;
+use crate::client::mongo_client::MongoManager;
+
+#[get("/<shop_id>")]
+pub async fn get_shop_details(
+    auth_user: AuthUser,
+    mongo_manager: &State<MongoManager>,
+    shop_id: &str
+) -> Custom<RawJson<String>> {
+}
+
+
+#[post("/")]
+pub async fn create_shop() -> Custom<RawJson<String>>{
+    todo!();
+}
+
+
+#[patch("/<shop_id>")]
+pub async fn update_shop(shop_id: &str) -> Custom<RawJson<String>>{
+    todo!();
+}
+
+
+#[get("/live-location")]
+pub async fn shop_location_ws(ws: ws::WebSocket) -> ws::Stream!['static]{
+    ws::Stream! { ws =>
+        for await message in ws {
+            yield message?;
+        }
+    }
+}
+
