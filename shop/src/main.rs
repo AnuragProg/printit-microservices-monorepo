@@ -14,7 +14,7 @@ use mongodb::Client;
 async fn main() -> Result<(), rocket::Error>{
 
     // connect to mongo
-    let mongo_client = Client::with_uri_str("mongodb://localhost:27017/prinit?maxPoolSize=100").await.unwrap();
+    let mongo_client = Client::with_uri_str("mongodb://localhost:27017/printit?maxPoolSize=100").await.unwrap();
 
     // connecting to grpc clients
     let mut auth_grpc_client = AuthenticationClient::connect("http://[::1]:50051").await.unwrap();

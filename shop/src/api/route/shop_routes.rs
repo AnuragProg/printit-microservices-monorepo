@@ -8,6 +8,7 @@ use crate::api::guards::auth_guard::{AuthUser, AuthShopkeeper};
 use crate::client::mongo_client::MongoManager;
 use crate::data::shop::{Shop, ShopBody};
 use mongodb::bson::oid::ObjectId;
+use mongodb::bson::doc;
 
 
 // TODO for the whole service
@@ -15,14 +16,25 @@ use mongodb::bson::oid::ObjectId;
 
 
 
-
 #[get("/<shop_id>")]
 pub async fn get_shop_details(
-    auth_user: AuthUser,
+    _auth_user: AuthUser,
     mongo_manager: &State<MongoManager>,
     shop_id: &str
 ) -> Custom<RawJson<String>> {
-    todo!();
+    let id = ObjectId::parse_str(shop_id);
+    if let Err(err) = id {
+        return Custom(Status::BadRequest, RawJson(json!({"message": err.to_string()}).to_string()));
+    }
+    let shop_res = mongo_manager.shop_col.find_one(doc!{"_id": id.unwrap()}, None).await;
+    if let Err(err) = shop_res{
+        return Custom(Status::InternalServerError, RawJson(json!({"message": err.to_string()}).to_string()));
+    }
+    let shop_opt = shop_res.unwrap();
+    if shop_opt.is_none() {
+        return Custom(Status::NotFound, RawJson(json!({"message": "shop not found"}).to_string()));
+    }
+    Custom(Status::Ok, RawJson(json!({"shop": shop_opt.unwrap()}).to_string()))
 }
 
 
