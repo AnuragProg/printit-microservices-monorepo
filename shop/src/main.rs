@@ -8,9 +8,16 @@ use std::net::Ipv4Addr;
 use api::route::shop_routes::{get_shop_details, create_shop, update_shop, shop_location_ws};
 use client::auth_grpc_client::{authentication_client::AuthenticationClient, AuthGrpcManager, Empty};
 use client::mongo_client::MongoManager;
+use services::shop_service::{ShopService, shop_server::ShopServer};
+use tonic::transport::Server;
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error>{
+
+    // start grpc server
+    let grpc_app = Server::builder()
+        .add_service(ShopServer::new(ShopService))
+        .serve("[::]:50052".parse().unwrap());
 
     // create mongo manager
     let mongo_manager = MongoManager::new().await;
@@ -33,9 +40,8 @@ async fn main() -> Result<(), rocket::Error>{
         .manage(AuthGrpcManager::new(auth_grpc_client))
         .configure(rest_config)
         .mount("/shop", routes![get_shop_details, create_shop, update_shop, shop_location_ws])
-        //.attach(ShopkeeperAuthMiddleware{})
         .launch();
 
-    tokio::join!(rest_app);
+    tokio::join!(rest_app, grpc_app);
     Ok(())
 }

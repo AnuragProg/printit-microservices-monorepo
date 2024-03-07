@@ -66,7 +66,6 @@ pub async fn create_shop(
         created_at: now,
         updated_at: now,
     };
-    println!("creating shop = {:?}", shop);
 
     // insert shop
     let result = mongo_manager.shop_col.insert_one(&shop, None).await;

@@ -1,0 +1,10 @@
+syntax = "proto3";
+package shop_grpc;
+
+
+message Empty{}
+
+
+service Shop{
+	rpc HealthCheck(Empty) returns (Empty);
+}
