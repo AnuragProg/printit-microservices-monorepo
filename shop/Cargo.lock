@@ -234,6 +234,7 @@ dependencies = [
  "ahash",
  "base64 0.13.1",
  "bitvec",
+ "chrono",
  "hex",
  "indexmap 2.2.5",
  "js-sys",
@@ -1921,6 +1922,7 @@ dependencies = [
 name = "shop"
 version = "0.1.0"
 dependencies = [
+ "bson",
  "chrono",
  "mongodb",
  "prost",

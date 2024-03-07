@@ -8,13 +8,12 @@ use std::net::Ipv4Addr;
 use api::route::shop_routes::{get_shop_details, create_shop, update_shop, shop_location_ws};
 use client::auth_grpc_client::{authentication_client::AuthenticationClient, AuthGrpcManager, Empty};
 use client::mongo_client::MongoManager;
-use mongodb::Client;
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error>{
 
-    // connect to mongo
-    let mongo_client = Client::with_uri_str("mongodb://localhost:27017/printit?maxPoolSize=100").await.unwrap();
+    // create mongo manager
+    let mongo_manager = MongoManager::new().await;
 
     // connecting to grpc clients
     let mut auth_grpc_client = AuthenticationClient::connect("http://[::1]:50051").await.unwrap();
@@ -30,7 +29,7 @@ async fn main() -> Result<(), rocket::Error>{
 
     //starting rest app
     let rest_app = rocket::build()
-        .manage(MongoManager::new(mongo_client))
+        .manage(mongo_manager)
         .manage(AuthGrpcManager::new(auth_grpc_client))
         .configure(rest_config)
         .mount("/shop", routes![get_shop_details, create_shop, update_shop, shop_location_ws])

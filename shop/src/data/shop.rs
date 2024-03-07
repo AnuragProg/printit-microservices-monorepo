@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize};
 use crate::data::location::Location;
 use mongodb::bson::oid::ObjectId;
+use bson::DateTime;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Shop{
@@ -10,8 +11,8 @@ pub struct Shop{
     pub contact: String,
     pub email: String,
     pub location: Location,
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    pub updated_at: chrono::DateTime<chrono::Utc>,
+    pub created_at: DateTime,
+    pub updated_at: DateTime,
 }
 
 
@@ -20,5 +21,14 @@ pub struct ShopBody{
     pub name: String,
     pub contact: String,
     pub email: String,
-    pub location: Location
+    pub location: [f64;2]
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ShopUpdateBody{
+    pub name: Option<String>,
+    pub contact: Option<String>,
+    pub email: Option<String>,
+    pub location: Option<[f64;2]>
 }
