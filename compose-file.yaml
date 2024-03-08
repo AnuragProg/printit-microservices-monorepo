@@ -27,7 +27,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile.authentication
+      dockerfile: auth.Dockerfile
     depends_on:
       - auth-redis
       - auth-postgres
@@ -67,7 +67,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile.file
+      dockerfile: file.Dockerfile
     depends_on:
       - auth-app
       - file-mongo

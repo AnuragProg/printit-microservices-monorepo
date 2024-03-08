@@ -9,9 +9,9 @@ pub struct MongoManager{
 }
 
 impl MongoManager{
-    pub async fn new() -> Self {
+    pub async fn new(mongo_uri: String) -> Self {
         // creating client
-        let client = Client::with_uri_str("mongodb://localhost:27017/?maxPoolSize=100").await.unwrap();
+        let client = Client::with_uri_str(mongo_uri).await.unwrap();
 
         // db
         let printit_db = client.database("printit");

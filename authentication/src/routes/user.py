@@ -221,6 +221,13 @@ class UserRouter:
                 )
             print(f"Found invalid purpose {info['purpose']}")
             raise Exception('Invalid purpose')
+        except NotFound:
+            return JSONResponse(
+                content={
+                    "message": "invalid otp"
+                },
+                status_code=200
+            )
         except Exception as e:
             print(e)
             return JSONResponse(

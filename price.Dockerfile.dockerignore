@@ -1,0 +1,8 @@
+pyvenv.cfg
+
+**/Lib/
+**/Scripts/
+**/__pycache__/
+**/proto_gen/**
+
+!**/proto_gen/__init__.py

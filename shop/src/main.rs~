@@ -15,10 +15,10 @@ use tonic::transport::Server;
 async fn main() -> Result<(), rocket::Error>{
 
     // consts
-    let REST_PORT = std::env::var("REST_PORT").unwrap_or("3002".to_string());
-    let GRPC_PORT = std::env::var("GRPC_PORT").unwrap_or("50053".to_string());
-    let AUTH_GRPC_URI = std::env::var("AUTH_GRPC_URI").unwrap_or("http://[::1]:50051".to_string());
-    let MONGO_URI = std::env::var("MONGO_URI").unwrap_or("mongodb://localhost:27017/?maxPoolSize=100".to_string());
+    let REST_PORT = std::option_env!("REST_PORT").unwrap_or("3002");
+    let GRPC_PORT = std::option_env!("GRPC_PORT").unwrap_or("50053");
+    let AUTH_GRPC_URI = std::option_env!("AUTH_GRPC_URI").unwrap_or("http://[::1]:50051");
+    let MONGO_URI = std::option_env!("MONGO_URI").unwrap_or("mongodb://localhost:27017/?maxPoolSize=100");
 
     // start grpc server
     let grpc_app = Server::builder()

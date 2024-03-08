@@ -7,7 +7,7 @@ tasks:
 
   # authentication server tasks
   auth-docker:
-    - docker compose -f ./compose-authentication.yaml up --build
+    - docker compose -f ./compose-auth.yaml up --build
   auth-psql:
     - docker run -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=users -p 5432:5432 postgres
   auth-redis:
@@ -21,12 +21,16 @@ tasks:
     - protoc --go_out=./file/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
   file-minio:
     - docker run -p 9000:9000 -p 9001:9001 --env MINIO_ROOT_USER=minio-access-key --env MINIO_ROOT_PASSWORD=minio-secret-key bitnami/minio:latest
+  auth-file-docker: # because to run file service we also need auth ( explanation for naming convention )
+    - docker compose -f ./compose-file.yaml up --build
 
-  auth-file-docker:
-    - docker compose -f ./compose.yaml up --build
+  # shop server tasks
+  shop-docker:
+    - docker compose -f ./compose-shop.yaml up --build
 
   # price server tasks
   price-proto-gen:
     - python -m grpc_tools.protoc --proto_path=./proto_def/authentication --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen auth.proto
     - python -m grpc_tools.protoc --proto_path=./proto_def/file --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen file.proto
     - python -m grpc_tools.protoc --proto_path=./proto_def/shop --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen shop.proto
+    - python -m grpc_tools.protoc --proto_path=./proto_def/price --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen price.proto

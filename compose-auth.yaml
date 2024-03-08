@@ -25,7 +25,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile.authentication
+      dockerfile: auth.Dockerfile
     environment:
       - REST_HOST=0.0.0.0
       - REST_PORT=3000
