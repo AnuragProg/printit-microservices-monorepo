@@ -14,10 +14,14 @@ use tonic::transport::Server;
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error>{
 
+    // consts
+    let REST_PORT = std::option_env!("REST_PORT").unwrap_or("3002");
+    let GRPC_PORT = std::option_env!("GRPC_PORT").unwrap_or("50053");
+
     // start grpc server
     let grpc_app = Server::builder()
         .add_service(ShopServer::new(ShopService))
-        .serve("[::]:50052".parse().unwrap());
+        .serve(format!("[::]:{GRPC_PORT}").parse().unwrap());
 
     // create mongo manager
     let mongo_manager = MongoManager::new().await;
@@ -30,7 +34,7 @@ async fn main() -> Result<(), rocket::Error>{
     // creating rest config
     let rest_config = rocket::Config{
         address: Ipv4Addr::new(0,0,0,0).into(),
-        port: 3002,
+        port: REST_PORT.parse().unwrap(),
         ..rocket::Config::default()
     };
 

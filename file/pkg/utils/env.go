@@ -1,7 +1,9 @@
 package utils
 
+import "os"
 
-func GetenvOrDefault(env, def string) string {
+func GetenvOrDefault(key, def string) string {
+	env := os.Getenv(key)
 	if env == "" {
 		return def
 	}

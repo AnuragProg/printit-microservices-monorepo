@@ -3,32 +3,53 @@ package main
 import (
 	"context"
 	"fmt"
+	"net"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 
-	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
+	"google.golang.org/grpc"
+
+	file_service "github.com/AnuragProg/printit-microservices-monorepo/file/internal/services"
+	pb "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/file"
+
 	route "github.com/AnuragProg/printit-microservices-monorepo/file/internal/api/routes"
 	client "github.com/AnuragProg/printit-microservices-monorepo/file/internal/client"
 	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
 	utils "github.com/AnuragProg/printit-microservices-monorepo/file/pkg/utils"
+	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
 )
 
 var (
-	MONGO_URI = utils.GetenvOrDefault(os.Getenv("MONGO_URI"), "mongodb://localhost:27017/printit")
-	AUTH_GRPC_URI = utils.GetenvOrDefault(os.Getenv("AUTH_GRPC_URI"), "localhost:50051")
-	REST_PORT = utils.GetenvOrDefault(os.Getenv("REST_PORT"), "3001")
+	MONGO_URI = utils.GetenvOrDefault("MONGO_URI", "mongodb://localhost:27017/printit")
+	AUTH_GRPC_URI = utils.GetenvOrDefault("AUTH_GRPC_URI", "localhost:50051")
+	REST_PORT = utils.GetenvOrDefault("REST_PORT", "3001")
+	GRPC_PORT = utils.GetenvOrDefault("GRPC_PORT", "50052")
 
-	MINIO_URI = utils.GetenvOrDefault(os.Getenv("MINIO_URI"), "localhost:9000")
-	MINIO_SERVER_ACCESS_KEY = utils.GetenvOrDefault(os.Getenv("MINIO_SERVER_ACCESS_KEY"), "minio-access-key")
-	MINIO_SERVER_SECRET_KEY = utils.GetenvOrDefault(os.Getenv("MINIO_SERVER_SECRET_KEY"), "minio-secret-key")
+	MINIO_URI = utils.GetenvOrDefault("MINIO_URI", "localhost:9000")
+	MINIO_SERVER_ACCESS_KEY = utils.GetenvOrDefault("MINIO_SERVER_ACCESS_KEY", "minio-access-key")
+	MINIO_SERVER_SECRET_KEY = utils.GetenvOrDefault("MINIO_SERVER_SECRET_KEY", "minio-secret-key")
 )
 
 func main(){
 
 	// setup grpc server for file service functionalitities
-	// TODO yet to be made
+	grpcServer := grpc.NewServer()
+	pb.RegisterFileServer(grpcServer, &file_service.FileService{})
+	go func(){
+		grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%v", GRPC_PORT))
+		if err != nil{
+			panic(err.Error())
+		}
+		log.Info("(GRPC) Listening on :", GRPC_PORT)
+		if err := grpcServer.Serve(grpcListener); err!=nil{
+			panic(err.Error())
+		}
+	}()
 
 	// connect to mongo database
 	mongoClient, mongoDB, err := client.GetMongoClientAndDB(MONGO_URI)
@@ -59,6 +80,7 @@ func main(){
 	restApp := fiber.New(fiber.Config{
 		BodyLimit: 10 * 1024 * 1024, // 10 MB
 	})
+	defer restApp.ShutdownWithTimeout(10*time.Second)
 
 	// setup top level routes
 	fileRouter := restApp.Group("/file")
@@ -70,7 +92,15 @@ func main(){
 	}
 	fileRoute.SetupRoutes()
 
-	// start rest server
-	log.Info("Listening on :", REST_PORT)
-	restApp.Listen(fmt.Sprintf(":%v", REST_PORT))
+	go func(){
+		// start rest server
+		log.Info("(REST) Listening on :", REST_PORT)
+		restApp.Listen(fmt.Sprintf(":%v", REST_PORT))
+	}()
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	<-sig
+
+	log.Info("Shutting down file service")
 }

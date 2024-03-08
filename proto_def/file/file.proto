@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option go_package = "github.com/AnuragProg/printit-microservices-monorepo/file/internal/proto_gen/file";
+
+package file_grpc;
+
+
+message Empty{}
+
+
+service File{
+	rpc HealthCheck(Empty) returns (Empty);
+}
