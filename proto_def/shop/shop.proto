@@ -4,7 +4,27 @@ package shop_grpc;
 
 message Empty{}
 
+message Location{
+	double lat = 1;
+	double lng = 2;
+}
+
+message ShopInfo{
+	string _id = 1;
+	string user_id = 2;
+	string name = 3;
+	string contact = 4;
+	string email = 5;
+	Location location = 6;
+	string created_at = 7;
+	string updated_at = 8;
+}
+
+message ShopId{
+	string _id = 1;
+}
 
 service Shop{
 	rpc HealthCheck(Empty) returns (Empty);
+	rpc VerifyShop(ShopId) returns (ShopInfo);
 }

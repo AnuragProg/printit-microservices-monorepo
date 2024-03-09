@@ -2,6 +2,7 @@ use crate::data::shop::Shop;
 use mongodb::{Client, Collection, Database, IndexModel, bson::doc};
 
 
+#[derive(Debug)]
 pub struct MongoManager{
     client: Client,
     printit_db: Database,

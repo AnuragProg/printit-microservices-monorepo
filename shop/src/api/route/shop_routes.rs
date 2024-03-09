@@ -8,6 +8,7 @@ use crate::client::mongo_client::MongoManager;
 use crate::data::shop::{Shop, ShopBody, ShopUpdateBody};
 use crate::data::location::Location;
 use mongodb::{options, bson::{doc, oid::ObjectId}};
+use std::sync::Arc;
 
 
 // TODO for the whole service
@@ -17,7 +18,7 @@ use mongodb::{options, bson::{doc, oid::ObjectId}};
 #[get("/<shop_id>")]
 pub async fn get_shop_details(
     _auth_user: AuthUser,
-    mongo_manager: &State<MongoManager>,
+    mongo_manager: &State<Arc<MongoManager>>,
     shop_id: &str
 ) -> Custom<RawJson<String>> {
 
@@ -44,7 +45,7 @@ pub async fn get_shop_details(
 #[post("/", data="<shop_details>")]
 pub async fn create_shop(
     auth_shopkeeper: AuthShopkeeper,
-    mongo_manager: &State<MongoManager>,
+    mongo_manager: &State<Arc<MongoManager>>,
     shop_details: Json<ShopBody>
 ) -> Custom<RawJson<String>>{
 
@@ -79,7 +80,7 @@ pub async fn create_shop(
 #[patch("/<shop_id>", data="<shop_update_details>")]
 pub async fn update_shop(
     auth_shopkeeper: AuthShopkeeper,
-    mongo_manager: &State<MongoManager>,
+    mongo_manager: &State<Arc<MongoManager>>,
     shop_id: &str,
     shop_update_details: Json<ShopUpdateBody>
 ) -> Custom<RawJson<String>>{

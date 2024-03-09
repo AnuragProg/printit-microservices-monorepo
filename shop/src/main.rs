@@ -10,6 +10,7 @@ use client::auth_grpc_client::{authentication_client::AuthenticationClient, Auth
 use client::mongo_client::MongoManager;
 use services::shop_service::{ShopService, shop_server::ShopServer};
 use tonic::transport::Server;
+use std::sync::Arc;
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error>{
@@ -20,13 +21,13 @@ async fn main() -> Result<(), rocket::Error>{
     let AUTH_GRPC_URI = std::env::var("AUTH_GRPC_URI").unwrap_or("http://[::1]:50051".to_string());
     let MONGO_URI = std::env::var("MONGO_URI").unwrap_or("mongodb://localhost:27017/?maxPoolSize=100".to_string());
 
+    // create mongo manager
+    let mongo_manager = Arc::new(MongoManager::new(MONGO_URI).await);
+
     // start grpc server
     let grpc_app = Server::builder()
-        .add_service(ShopServer::new(ShopService))
+        .add_service(ShopServer::new(ShopService::new(mongo_manager.clone())))
         .serve(format!("[::]:{GRPC_PORT}").parse().unwrap());
-
-    // create mongo manager
-    let mongo_manager = MongoManager::new(MONGO_URI).await;
 
     // connecting to grpc clients
     let mut auth_grpc_client = AuthenticationClient::connect(AUTH_GRPC_URI).await.unwrap();
