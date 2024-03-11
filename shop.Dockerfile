@@ -14,6 +14,6 @@ RUN apt-get update
 RUN apt-get install -y protobuf-compiler
 
 # install corresponding dependencies
-RUN cargo build	--release
+RUN cargo build #--release # commented for development purposes
 
-CMD ["./target/release/shop"]
+CMD ["./target/debug/shop"]

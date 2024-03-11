@@ -12,3 +12,7 @@ docker/
 
 # shop service junk
 target/
+
+
+# nvim save files
+*~

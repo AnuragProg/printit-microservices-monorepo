@@ -20,11 +20,20 @@ message ShopInfo{
 	string updated_at = 8;
 }
 
+message ShopkeeperId{
+	string _id = 1;
+}
 message ShopId{
 	string _id = 1;
+}
+message ShopAndShopkeeperId{
+	string shop_id = 1;
+	string shopkeeper_id = 2;
 }
 
 service Shop{
 	rpc HealthCheck(Empty) returns (Empty);
-	rpc VerifyShop(ShopId) returns (ShopInfo);
+	rpc GetShopById(ShopId) returns (ShopInfo);
+	rpc GetShopByShopkeeperId(ShopkeeperId) returns (ShopInfo);
+	rpc GetShopByShopAndShopkeeperId(ShopAndShopkeeperId) returns (ShopInfo);
 }

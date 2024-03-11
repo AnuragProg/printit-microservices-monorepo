@@ -1,6 +1,7 @@
-from typing import Union
+from typing import Coroutine, Union, List
 import os
 import asyncpg
+
 
 PG_HOST = os.getenv('PG_HOST', 'localhost')
 
@@ -42,4 +43,23 @@ class PostgresClient:
             if len(args)==0:
                 return await conn.execute(query)
             return await conn.execute(query, *args)
+
+
+__pg_client = None
+
+async def get_pg_client():
+    global __pg_client
+    if __pg_client is None:
+        __pg_client = PostgresClient()
+        await __pg_client.connect()
+    return __pg_client
+
+
+async def close_pg_client():
+    global __pg_client
+    if __pg_client is not None:
+        await __pg_client.close()
+
+
+
 

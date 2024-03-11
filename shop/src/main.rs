@@ -4,13 +4,13 @@ mod services;
 mod utils;
 mod client;
 use rocket::routes;
+use std::sync::Arc;
 use std::net::Ipv4Addr;
+use tonic::transport::Server;
+use client::mongo_client::MongoManager;
 use api::route::shop_routes::{get_shop_details, create_shop, update_shop, shop_location_ws};
 use client::auth_grpc_client::{authentication_client::AuthenticationClient, AuthGrpcManager, Empty};
-use client::mongo_client::MongoManager;
 use services::shop_service::{ShopService, shop_server::ShopServer};
-use tonic::transport::Server;
-use std::sync::Arc;
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error>{

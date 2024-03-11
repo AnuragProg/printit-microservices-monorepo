@@ -35,3 +35,6 @@ tasks:
     - python -m grpc_tools.protoc --proto_path=./proto_def/file --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen file.proto
     - python -m grpc_tools.protoc --proto_path=./proto_def/shop --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen shop.proto
     - python -m grpc_tools.protoc --proto_path=./proto_def/price --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen price.proto
+  price-psql:
+    - docker run -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=printit -p 5432:5432 postgres
+
