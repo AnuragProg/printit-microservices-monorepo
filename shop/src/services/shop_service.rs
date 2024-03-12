@@ -1,38 +1,10 @@
 tonic::include_proto!("shop_grpc");
 use shop_server::Shop;
 use tonic::{Request, Response, Status};
-use crate::data::shop::{Shop as ShopDoc};
-use crate::data::location::{Location as LocationDoc};
 use crate::client::mongo_client::MongoManager;
-use mongodb::bson::{oid::ObjectId, doc};
+use mongodb::bson::{doc, oid::ObjectId};
 use std::sync::Arc;
-use std::convert::From;
 
-
-
-impl From<LocationDoc> for Location{
-    fn from(location: LocationDoc) -> Self {
-        Location {
-            lng: location.coordinates[0],
-            lat: location.coordinates[1]
-        }
-    }
-}
-
-impl From<ShopDoc> for ShopInfo{
-    fn from(val: ShopDoc) -> Self {
-        ShopInfo{
-            id: val._id.to_hex(),
-            user_id: val.user_id,
-            name: val.name,
-            contact: val.contact,
-            email: val.email,
-            location: Some(Location::from(val.location)),
-            created_at: val.created_at.try_to_rfc3339_string().unwrap(),
-            updated_at: val.updated_at.try_to_rfc3339_string().unwrap(),
-        }
-    }
-}
 
 
 #[derive(Debug)]

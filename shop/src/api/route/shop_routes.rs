@@ -1,14 +1,14 @@
 use rocket::State;
-use rocket::response::{content::RawJson, status::Custom};
-use rocket::{get, post, patch};
-use rocket::http::Status;
-use rocket::serde::json::{json, Json};
-use crate::api::guards::auth_guard::{AuthUser, AuthShopkeeper};
-use crate::client::mongo_client::MongoManager;
-use crate::data::shop::{Shop, ShopBody, ShopUpdateBody};
-use crate::data::location::Location;
-use mongodb::{options, bson::{doc, oid::ObjectId}};
 use std::sync::Arc;
+use rocket::http::Status;
+use rocket::{get, post, patch};
+use crate::data::location::Location;
+use rocket::serde::json::{json, Json};
+use crate::client::mongo_client::MongoManager;
+use mongodb::{options, bson::{doc, oid::ObjectId}};
+use rocket::response::{content::RawJson, status::Custom};
+use crate::api::guards::auth_guard::{AuthUser, AuthShopkeeper};
+use crate::data::shop::{Shop, ShopBody, ShopUpdateBody, ShopResponse};
 
 
 // TODO for the whole service
@@ -37,7 +37,7 @@ pub async fn get_shop_details(
     if shop_opt.is_none() {
         return Custom(Status::NotFound, RawJson(json!({"message": "shop not found"}).to_string()));
     }
-    Custom(Status::Ok, RawJson(json!({"shop": shop_opt.unwrap()}).to_string()))
+    Custom(Status::Ok, RawJson(json!({"shop": ShopResponse::from(shop_opt.unwrap())}).to_string()))
 }
 
 
@@ -73,7 +73,7 @@ pub async fn create_shop(
     if let Err(err) = result{
         return Custom(Status::InternalServerError, RawJson(json!({"message": err.to_string()}).to_string()));
     }
-    Custom(Status::Ok, RawJson(json!({"message": "shop created successfully", "shop": shop}).to_string()))
+    Custom(Status::Ok, RawJson(json!({"message": "shop created successfully", "shop": ShopResponse::from(shop)}).to_string()))
 }
 
 
@@ -140,7 +140,7 @@ pub async fn update_shop(
     if shop.is_none() {
         return Custom(Status::NotFound, RawJson(json!({"message": "shop not found"}).to_string()));
     }
-    Custom(Status::Ok, RawJson(json!({"message": "shop data updated successfully", "shop": shop.unwrap()}).to_string()))
+    Custom(Status::Ok, RawJson(json!({"message": "shop data updated successfully", "shop": ShopResponse::from(shop.unwrap())}).to_string()))
 }
 
 

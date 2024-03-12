@@ -1,4 +1,6 @@
 use serde::{Serialize, Deserialize};
+use crate::services::shop_service::{Location as LocationProto};
+use std::convert::From;
 
 
 
@@ -7,4 +9,13 @@ pub struct Location{
     #[serde(rename="type")]
     pub location_type: String,
     pub coordinates: [f64;2] // [lng, lat]
+}
+
+impl From<Location> for LocationProto{
+    fn from(location: Location) -> Self {
+        LocationProto {
+            lng: location.coordinates[0],
+            lat: location.coordinates[1]
+        }
+    }
 }
