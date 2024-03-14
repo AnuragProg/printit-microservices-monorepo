@@ -3,6 +3,11 @@ FROM golang:1.21-alpine
 # setting working directory
 WORKDIR /usr/app/file
 
+# installing protoc
+RUN apk add --no-cache protobuf
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
 # copy mod and sum files
 COPY ./file/go.mod ./file/go.sum ./
 
@@ -14,11 +19,6 @@ COPY ./proto_def ../proto_def
 
 # copying rest of the files
 COPY ./file .
-
-# installing protoc
-RUN apk add --no-cache protobuf
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 # generate proto files
 RUN mkdir -p proto_gen/authentication

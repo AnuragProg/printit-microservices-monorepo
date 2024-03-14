@@ -4,7 +4,31 @@ package price_grpc;
 
 message Empty{}
 
+enum PageSize{
+	A4 = 0;
+}
+
+enum PageColor{
+	BlackNWhite = 0;
+	Color = 1;
+}
+
+message PriceInfo{
+	string _id								= 1;
+	string shop_id						= 2;
+	string shopkeeper_id			= 3;
+	PageColor color						= 4;
+	PageSize page_size				= 5;
+	float single_sided_price	= 6;
+	float double_sided_price	= 7;
+}
+
+message PriceIdAndShopId{
+	string price_id = 1;
+	string shop_id	= 2;
+}
 
 service Price{
 	rpc HealthCheck(Empty) returns (Empty);
+	rpc GetPriceInfoByPriceIdAndShopId(PriceIdAndShopId) returns (PriceInfo);
 }

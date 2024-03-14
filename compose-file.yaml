@@ -76,11 +76,13 @@ services:
       - MONGO_URI=mongodb://file-mongo:27017/printit
       - AUTH_GRPC_URI=auth-app:50051
       - REST_PORT=3001
+      - GRPC_PORT=50052
       - MINIO_URI=file-minio:9000
       - MINIO_SERVER_ACCESS_KEY=minio-access-key
       - MINIO_SERVER_SECRET_KEY=minio-secret-key
     ports:
       - "3001:3001"
+      - "50052:50052"
     networks:
       - default
 

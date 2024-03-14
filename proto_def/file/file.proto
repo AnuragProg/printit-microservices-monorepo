@@ -8,6 +8,22 @@ package file_grpc;
 message Empty{}
 
 
+message FileMetadata{
+	string id							= 1;
+	string user_id				= 2;
+	string file_name			= 3;
+	string bucket_name		= 4;
+	uint32 size						= 5;
+	string content_type		= 6;
+	string created_at			= 7;
+	string updated_at			= 8;
+}
+
+message FileId{
+	string _id = 1;
+}
+
 service File{
 	rpc HealthCheck(Empty) returns (Empty);
+	rpc GetFileMetadataById(FileId) returns (FileMetadata); // implement this in file service
 }

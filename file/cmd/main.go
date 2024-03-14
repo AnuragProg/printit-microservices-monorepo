@@ -37,23 +37,10 @@ var (
 
 func main(){
 
-	// setup grpc server for file service functionalitities
-	grpcServer := grpc.NewServer()
-	pb.RegisterFileServer(grpcServer, &file_service.FileService{})
-	go func(){
-		grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%v", GRPC_PORT))
-		if err != nil{
-			panic(err.Error())
-		}
-		log.Info("(GRPC) Listening on :", GRPC_PORT)
-		if err := grpcServer.Serve(grpcListener); err!=nil{
-			panic(err.Error())
-		}
-	}()
-
 	// connect to mongo database
 	mongoClient, mongoDB, err := client.GetMongoClientAndDB(MONGO_URI)
 	if err != nil{
+		log.Error(err.Error())
 		panic(err.Error())
 	}
 	defer mongoClient.Disconnect(context.Background())
@@ -62,17 +49,36 @@ func main(){
 	// connect to minio client
 	minioClient, err := client.GetMinioClient(MINIO_URI, MINIO_SERVER_ACCESS_KEY, MINIO_SERVER_SECRET_KEY)
 	if err != nil{
+		log.Error(err.Error())
 		panic(err.Error())
 	}
+
+	// setup grpc server for file service functionalitities
+	grpcServer := grpc.NewServer()
+	pb.RegisterFileServer(grpcServer, file_service.NewFileService(mongoFileMetadataCol))
+	go func(){
+		grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%v", GRPC_PORT))
+		if err != nil{
+			log.Error(err.Error())
+			panic(err.Error())
+		}
+		log.Info("(GRPC) Listening on :", GRPC_PORT)
+		if err := grpcServer.Serve(grpcListener); err!=nil{
+			log.Error(err.Error())
+			panic(err.Error())
+		}
+	}()
 
 	// connect to grpc servers
 	authGrpcConn, err := client.GetAuthGrpcConnAndClient(AUTH_GRPC_URI)
 	if err != nil{
+		log.Error(err.Error())
 		panic(err.Error())
 	}
 	defer authGrpcConn.Close()
 	authGrpcClient := auth.NewAuthenticationClient(authGrpcConn)
 	if _, err = authGrpcClient.HealthCheck(context.Background(), &auth.Empty{}); err != nil{
+		log.Error(err.Error())
 		panic(err.Error())
 	}
 
