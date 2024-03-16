@@ -1,16 +1,16 @@
 mod api;
 mod data;
-mod services;
-mod utils;
+mod service;
+mod util;
 mod client;
 use rocket::routes;
 use std::sync::Arc;
 use std::net::Ipv4Addr;
 use tonic::transport::Server;
 use client::mongo_client::MongoManager;
-use api::route::shop_routes::{get_shop_details, create_shop, update_shop, shop_location_ws};
+use api::route::shop::{get_shop_details, create_shop, update_shop, shop_location_ws};
 use client::auth_grpc_client::{authentication_client::AuthenticationClient, AuthGrpcManager, Empty};
-use services::shop_service::{ShopService, shop_server::ShopServer};
+use service::shop::{ShopService, shop_server::ShopServer};
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error>{
@@ -24,15 +24,14 @@ async fn main() -> Result<(), rocket::Error>{
     // create mongo manager
     let mongo_manager = Arc::new(MongoManager::new(MONGO_URI).await);
 
-    // start grpc server
-    let grpc_app = Server::builder()
-        .add_service(ShopServer::new(ShopService::new(mongo_manager.clone())))
-        .serve(format!("[::]:{GRPC_PORT}").parse().unwrap());
-
     // connecting to grpc clients
     let mut auth_grpc_client = AuthenticationClient::connect(AUTH_GRPC_URI).await.unwrap();
     auth_grpc_client.health_check(Empty{}).await.unwrap(); // check grpc client
 
+    // start grpc server
+    let grpc_app = Server::builder()
+        .add_service(ShopServer::new(ShopService::new(mongo_manager.clone())))
+        .serve(format!("[::]:{GRPC_PORT}").parse().unwrap());
 
     // creating rest config
     let rest_config = rocket::Config{

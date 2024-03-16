@@ -22,7 +22,7 @@ tasks:
     - protoc --go_out=./file/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
   file-minio:
     - docker run -p 9000:9000 -p 9001:9001 --env MINIO_ROOT_USER=minio-access-key --env MINIO_ROOT_PASSWORD=minio-secret-key bitnami/minio:latest
-  auth-file-docker: # because to run file service we also need auth ( explanation for naming convention )
+  file-docker: # because to run file service we also need auth ( explanation for naming convention )
     - docker compose -f ./compose-file.yaml up --build
 
   # shop server tasks
@@ -37,4 +37,15 @@ tasks:
     - python -m grpc_tools.protoc --proto_path=./proto_def/price --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen price.proto
   price-psql:
     - docker run -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=printit -p 5432:5432 postgres
+
+  # order server tasks
+  order-proto-gen:
+    - protoc --go_out=./order/proto_gen/authentication --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/authentication --go-grpc_opt=paths=source_relative --proto_path=./proto_def/authentication ./proto_def/authentication/auth.proto
+    - protoc --go_out=./order/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
+    - protoc --go_out=./order/proto_gen/shop --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/shop --go-grpc_opt=paths=source_relative --proto_path=./proto_def/shop ./proto_def/shop/shop.proto
+    - protoc --go_out=./order/proto_gen/price --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/price --go-grpc_opt=paths=source_relative --proto_path=./proto_def/price ./proto_def/price/price.proto
+    - protoc --go_out=./order/proto_gen/order --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/order --go-grpc_opt=paths=source_relative --proto_path=./proto_def/order ./proto_def/order/order.proto
+
+
+
 

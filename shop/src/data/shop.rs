@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 use crate::data::location::Location;
 use mongodb::bson::oid::ObjectId;
 use bson::DateTime;
-use crate::services::shop_service::{ShopInfo as ShopInfoProto, Location as LocationProto};
+use crate::service::shop::{ShopInfo as ShopInfoProto, Location as LocationProto};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Shop{

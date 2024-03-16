@@ -1,4 +1,4 @@
-package file_service
+package service
 
 import (
 	"time"
@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/AnuragProg/printit-microservices-monorepo/file/internal/data"
-	pb "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/file"
+	"github.com/AnuragProg/printit-microservices-monorepo/internal/data"
+	pb "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/file"
 )
 
 type FileService struct {

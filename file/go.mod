@@ -1,4 +1,4 @@
-module github.com/AnuragProg/printit-microservices-monorepo/file
+module github.com/AnuragProg/printit-microservices-monorepo
 
 go 1.21.0
 

@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use crate::services::shop_service::{Location as LocationProto};
+use crate::service::shop::{Location as LocationProto};
 use std::convert::From;
 
 

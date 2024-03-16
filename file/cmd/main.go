@@ -14,14 +14,14 @@ import (
 
 	"google.golang.org/grpc"
 
-	file_service "github.com/AnuragProg/printit-microservices-monorepo/file/internal/services"
-	pb "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/file"
+	file_service "github.com/AnuragProg/printit-microservices-monorepo/internal/service"
+	pb "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/file"
 
-	route "github.com/AnuragProg/printit-microservices-monorepo/file/internal/api/routes"
-	client "github.com/AnuragProg/printit-microservices-monorepo/file/internal/client"
-	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
-	utils "github.com/AnuragProg/printit-microservices-monorepo/file/pkg/utils"
-	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
+	route "github.com/AnuragProg/printit-microservices-monorepo/internal/api/route"
+	client "github.com/AnuragProg/printit-microservices-monorepo/internal/client"
+	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
+	utils "github.com/AnuragProg/printit-microservices-monorepo/pkg/util"
+	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
 )
 
 var (
@@ -68,6 +68,7 @@ func main(){
 			panic(err.Error())
 		}
 	}()
+	defer grpcServer.Stop()
 
 	// connect to grpc servers
 	authGrpcConn, err := client.GetAuthGrpcConnAndClient(AUTH_GRPC_URI)

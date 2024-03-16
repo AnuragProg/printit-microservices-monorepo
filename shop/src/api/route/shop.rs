@@ -7,7 +7,7 @@ use rocket::serde::json::{json, Json};
 use crate::client::mongo_client::MongoManager;
 use mongodb::{options, bson::{doc, oid::ObjectId}};
 use rocket::response::{content::RawJson, status::Custom};
-use crate::api::guards::auth_guard::{AuthUser, AuthShopkeeper};
+use crate::api::guard::auth::{AuthUser, AuthShopkeeper};
 use crate::data::shop::{Shop, ShopBody, ShopUpdateBody, ShopResponse};
 
 

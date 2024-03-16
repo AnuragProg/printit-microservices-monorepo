@@ -1,6 +1,7 @@
 syntax = "proto3";
 package shop_grpc;
 
+option go_package = "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/shop";
 
 message Empty{}
 

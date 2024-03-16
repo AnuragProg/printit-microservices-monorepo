@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
-	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
+	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
+	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
 )
 
 

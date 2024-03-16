@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"context"
@@ -15,9 +15,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
-	data "github.com/AnuragProg/printit-microservices-monorepo/file/internal/data"
-	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
+	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
+	data "github.com/AnuragProg/printit-microservices-monorepo/internal/data"
+	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
 )
 
 

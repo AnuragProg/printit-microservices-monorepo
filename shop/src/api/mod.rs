@@ -1,4 +1,4 @@
-pub mod guards;
+pub mod guard;
 pub mod route;
 
 //pub use handler::*;

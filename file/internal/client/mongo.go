@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
+	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
 )
 
 

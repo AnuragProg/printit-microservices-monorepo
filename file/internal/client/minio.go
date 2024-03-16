@@ -9,7 +9,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
-	consts "github.com/AnuragProg/printit-microservices-monorepo/file/internal/constants"
+	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
 )
 
 

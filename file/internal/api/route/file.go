@@ -1,13 +1,13 @@
-package routes
+package route
 
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/minio/minio-go/v7"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	handler "github.com/AnuragProg/printit-microservices-monorepo/file/internal/api/handlers"
-	mid "github.com/AnuragProg/printit-microservices-monorepo/file/internal/middleware"
-	auth "github.com/AnuragProg/printit-microservices-monorepo/file/proto_gen/authentication"
+	handler "github.com/AnuragProg/printit-microservices-monorepo/internal/api/handler"
+	mid "github.com/AnuragProg/printit-microservices-monorepo/internal/middleware"
+	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
 )
 
 

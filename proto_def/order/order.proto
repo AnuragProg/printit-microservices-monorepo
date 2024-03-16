@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/order";
+
+package order_grpc;
+
+message Empty{}
+
+service Order{
+	rpc HealthCheck(Empty) returns (Empty);
+}

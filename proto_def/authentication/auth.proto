@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/AnuragProg/printit-microservices-monorepo/file/internal/proto_gen/authentication";
+option go_package = "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication";
 
 package auth_grpc;
 
