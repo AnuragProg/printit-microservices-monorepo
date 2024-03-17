@@ -22,7 +22,7 @@ tasks:
     - protoc --go_out=./file/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
   file-minio:
     - docker run -p 9000:9000 -p 9001:9001 --env MINIO_ROOT_USER=minio-access-key --env MINIO_ROOT_PASSWORD=minio-secret-key bitnami/minio:latest
-  file-docker: # because to run file service we also need auth ( explanation for naming convention )
+  file-docker:
     - docker compose -f ./compose-file.yaml up --build
 
   # shop server tasks

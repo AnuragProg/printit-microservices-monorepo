@@ -14,20 +14,20 @@ import (
 )
 
 
-func GetAuthMiddleware(auth_grpc_client *auth.AuthenticationClient) fiber.Handler {
+func GetAuthMiddleware(authGrpcClient *auth.AuthenticationClient) fiber.Handler {
 	return func (c *fiber.Ctx) error {
 
 		// parse token
-		auth_header := c.Get("authorization")
-		auth_header_slice := strings.Split(auth_header, " ")
-		if len(auth_header_slice) != 2{
+		authHeader := c.Get("authorization")
+		authHeaderSlice := strings.Split(authHeader, " ")
+		if len(authHeaderSlice) != 2{
 			return fiber.NewError(fiber.StatusBadRequest, "please provide auth token")
 		}
-		token := auth_header_slice[1]
+		token := authHeaderSlice[1]
 		log.Info("Received token = ", token)
 
 		// verifying token
-		user, err := (*auth_grpc_client).VerifyToken(context.Background(), &auth.Token{ Token: token } )
+		user, err := (*authGrpcClient).VerifyToken(context.Background(), &auth.Token{ Token: token } )
 		if err != nil{
 			log.Error(err.Error())
 			res, _ := status.FromError(err)

@@ -8,7 +8,7 @@ import (
 
 
 type FileMetadata struct{
-	Id				primitive.ObjectID `bson:"_id" json:"id"`
+	Id				primitive.ObjectID `bson:"_id" json:"_id"`
 	UserId		string `bson:"user_id" json:"user_id"`
 	FileName		string `bson:"file_name" json:"file_name"`
 	BucketName	string `bson:"bucket_name" json:"bucket_name"`

@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	MONGO_URI = utils.GetenvOrDefault("MONGO_URI", "mongodb://localhost:27017/printit")
+	MONGO_URI = utils.GetenvOrDefault("MONGO_URI", "mongodb://localhost:27017")
 	AUTH_GRPC_URI = utils.GetenvOrDefault("AUTH_GRPC_URI", "localhost:50051")
 	REST_PORT = utils.GetenvOrDefault("REST_PORT", "3001")
 	GRPC_PORT = utils.GetenvOrDefault("GRPC_PORT", "50052")
