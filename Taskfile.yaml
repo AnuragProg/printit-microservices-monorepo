@@ -8,11 +8,7 @@ tasks:
 
   # authentication server tasks
   auth-docker:
-    - docker compose -f ./compose-auth.yaml up --build
-  auth-psql:
-    - docker run -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=users -p 5432:5432 postgres
-  auth-redis:
-    - docker run -p 6379:6379 redis
+    - docker compose -f ./compose-auth-dev.yaml up --build
   auth-proto-gen:
     - python -m grpc_tools.protoc --proto_path=./proto_def/authentication --python_out=./authentication/src/proto_gen --pyi_out=./authentication/src/proto_gen --grpc_python_out=./authentication/src/proto_gen auth.proto
 
@@ -35,8 +31,8 @@ tasks:
     - python -m grpc_tools.protoc --proto_path=./proto_def/file --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen file.proto
     - python -m grpc_tools.protoc --proto_path=./proto_def/shop --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen shop.proto
     - python -m grpc_tools.protoc --proto_path=./proto_def/price --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen price.proto
-  price-psql:
-    - docker run -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=printit -p 5432:5432 postgres
+  price-docker:
+    - docker compose -f compose-price-dev.yaml up --build
 
   # order server tasks
   order-proto-gen:
@@ -46,6 +42,6 @@ tasks:
     - protoc --go_out=./order/proto_gen/price --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/price --go-grpc_opt=paths=source_relative --proto_path=./proto_def/price ./proto_def/price/price.proto
     - protoc --go_out=./order/proto_gen/order --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/order --go-grpc_opt=paths=source_relative --proto_path=./proto_def/order ./proto_def/order/order.proto
 
-
-
+  order-dep-docker:
+    - docker compose -f compose-order.yaml up --build
 

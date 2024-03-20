@@ -1,0 +1,79 @@
+networks:
+    default: {}
+services:
+    auth-app:
+        build:
+            context: .
+            dockerfile: auth.Dockerfile
+        depends_on:
+            - auth-redis
+            - auth-postgres
+        environment:
+            - REST_HOST=0.0.0.0
+            - REST_PORT=3000
+            - GRPC_ADDR=0.0.0.0:50051
+            - PG_HOST=auth-postgres
+            - REDIS_URL=redis://auth-redis/0
+        networks:
+            - default
+        ports:
+            - 3000:3000
+            - 50051:50051
+        restart: always
+    auth-postgres:
+        environment:
+            POSTGRES_DB: printit
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+        image: postgres:16.2
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/authentication/pg:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+    auth-redis:
+        image: redis:7.2.4
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/authentication/redis:/data
+    price-postgres:
+        environment:
+            POSTGRES_DB: printit
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+        image: postgres:16.2
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/price/pg:/var/lib/postgresql/data
+    shop-app:
+        build:
+            context: .
+            dockerfile: shop.Dockerfile
+        depends_on:
+            - auth-app
+            - shop-mongo
+        environment:
+            - REST_PORT=3002
+            - GRPC_PORT=50053
+            - AUTH_GRPC_URI=http://auth-app:50051
+            - MONGO_URI=mongodb://shop-mongo/?maxPoolSize=100
+        networks:
+            - default
+        ports:
+            - 3002:3002
+            - 50053:50053
+        restart: always
+    shop-mongo:
+        image: mongo:7.0
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/shop/mongo:/data/db
+version: "3"

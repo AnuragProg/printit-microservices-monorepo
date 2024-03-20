@@ -34,7 +34,7 @@ func GetAuthMiddleware(authGrpcClient *auth.AuthenticationClient, userType ...au
 			return fiber.NewError(fiber.StatusUnauthorized, "not authorized")
 		}
 
-		c.Locals(consts.USER_LOCAL, user)
+		c.Locals(consts.USER_INFO_LOCAL, user)
 		return c.Next()
 	}
 }

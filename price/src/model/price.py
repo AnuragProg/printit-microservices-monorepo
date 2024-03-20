@@ -178,6 +178,18 @@ class PriceModel:
         )
         return list(map(Price.pg_record_to_price, price_records))
 
+    async def get_price_by_id_and_shop_id(self, price_id: uuid.UUID, shop_id: oid):
+        price_records = await self.pg_client.fetch(
+            '''
+            SELECT * FROM prices WHERE _id = $1 AND shop_id = $2;
+            ''',
+            price_id, shop_id.binary
+        )
+        if len(price_records) < 1:
+            raise NotFound(msg='price not found', resource='price')
+
+        return Price.pg_record_to_price(price_records[0])
+
     async def delete_price(self, price_id: uuid.UUID, shop_id: oid):
         await self.pg_client.execute(
             '''
