@@ -42,6 +42,7 @@ services:
     networks:
       - default
 
+
   # shop services
   shop-mongo:
     restart: always
@@ -103,9 +104,9 @@ services:
       - "3003:3003"
       - "50054:50054"
     networks:
-        - default
+      - default
 
-  # file services
+      # file services
   file-mongo:
     restart: always
     image: mongo:7.0
@@ -148,7 +149,7 @@ services:
     networks:
       - default
 
-  # order services
+      # order services
   order-mongo:
     restart: always
     image: mongo:7.0
