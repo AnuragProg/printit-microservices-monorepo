@@ -7,6 +7,9 @@ import (
 	mid "github.com/AnuragProg/printit-microservices-monorepo/internal/middleware"
 	"github.com/AnuragProg/printit-microservices-monorepo/internal/api/handler/order"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
+	"github.com/AnuragProg/printit-microservices-monorepo/proto_gen/file"
+	"github.com/AnuragProg/printit-microservices-monorepo/proto_gen/shop"
+	"github.com/AnuragProg/printit-microservices-monorepo/proto_gen/price"
 )
 
 
@@ -14,14 +17,27 @@ type OrderRoute struct {
 	Router *fiber.Router
 	OrderCol *mongo.Collection
 	AuthGrpcClient *auth.AuthenticationClient
+	FileGrpcClient *file.FileClient
+	ShopGrpcClient *shop.ShopClient
+	PriceGrpcClient *price.PriceClient
 }
 
 
-func New(router fiber.Router, orderCol *mongo.Collection, authGrpcClient *auth.AuthenticationClient) *OrderRoute {
+func New(
+	router fiber.Router,
+	orderCol *mongo.Collection,
+	authGrpcClient *auth.AuthenticationClient,
+	fileGrpcClient *file.FileClient,
+	shopGrpcClient *shop.ShopClient,
+	priceGrpcClient *price.PriceClient,
+) *OrderRoute {
 	orderRoute := OrderRoute{
 		Router: &router,
 		OrderCol: orderCol,
 		AuthGrpcClient: authGrpcClient,
+		FileGrpcClient: fileGrpcClient,
+		ShopGrpcClient: shopGrpcClient,
+		PriceGrpcClient: priceGrpcClient,
 	}
 	orderRoute.SetupRoutes()
 	return &orderRoute
@@ -33,7 +49,12 @@ func (or *OrderRoute)SetupRoutes() {
 	(*or.Router).Post(
 		"/shop/:shopId/orders",
 		mid.GetAuthMiddleware(or.AuthGrpcClient, auth.UserType_CUSTOMER),
-		order.GetCreateOrderHandler(or.OrderCol),
+		order.GetCreateOrderHandler(
+			or.OrderCol,
+			or.FileGrpcClient,
+			or.ShopGrpcClient,
+			or.PriceGrpcClient,
+		),
 	)
 
 	// update order status PATCH
@@ -55,8 +76,9 @@ func (or *OrderRoute)SetupRoutes() {
 
 	// list my orders (shopkeeper) GET
 	(*or.Router).Get(
-		"/shop/:shopId/orders/",
+		"/shop/:shopId/orders",
 		mid.GetAuthMiddleware(or.AuthGrpcClient, auth.UserType_SHOPKEEPER),
+		mid.GetShopOwnershipMiddleware(or.ShopGrpcClient),
 		order.GetListShopkeeperOrdersHandler(or.OrderCol),
 	)
 }

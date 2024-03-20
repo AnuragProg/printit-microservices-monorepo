@@ -45,11 +45,11 @@ func GetCreateOrderHandler(
 		// TODO: here authentication layer needs to be introduced so that only the user himself and the shopkeeper can see the file or fetch metadata
 		fileInfo, err := (*fileGrpcClient).GetFileMetadataById(context.Background(), &file.FileId{ XId: createOrderRequest.FileId })
 		if err != nil{
-			return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+			return fiber.NewError(fiber.StatusBadRequest, "invalid file id")
 		}
 		shopInfo, err := (*shopGrpcClient).GetShopById(context.Background(), &shop.ShopId{ XId: shopId })
 		if err != nil{
-			return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+			return fiber.NewError(fiber.StatusBadRequest, "invalid shop id")
 		}
 		priceInfo, err := (*priceGrpcClient).GetPriceInfoByPriceIdAndShopId(
 			context.Background(),
@@ -59,7 +59,7 @@ func GetCreateOrderHandler(
 			},
 		)
 		if err != nil{
-			return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+			return fiber.NewError(fiber.StatusBadRequest, "invalid price id")
 		}
 
 		order, err := data.CreateOrder(

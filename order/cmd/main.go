@@ -122,7 +122,14 @@ func main(){
 	})
 	defer restApp.ShutdownWithTimeout(10*time.Second)
 
-	_ = route.New(restApp.Group("/order"), mongoDB.OrderCol, &authGrpcClient)
+	_ = route.New(
+		restApp.Group("/order"),
+		mongoDB.OrderCol,
+		&authGrpcClient,
+		&fileGrpcClient,
+		&shopGrpcClient,
+		&priceGrpcClient,
+	)
 	go func(){
 		// start rest server
 		log.Info("(REST) Listening on :", REST_PORT)

@@ -16,12 +16,10 @@ tasks:
   file-proto-gen:
     - protoc --go_out=./file/proto_gen/authentication --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/authentication --go-grpc_opt=paths=source_relative --proto_path=./proto_def/authentication ./proto_def/authentication/auth.proto
     - protoc --go_out=./file/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
-  file-minio:
-    - docker run -p 9000:9000 -p 9001:9001 --env MINIO_ROOT_USER=minio-access-key --env MINIO_ROOT_PASSWORD=minio-secret-key bitnami/minio:latest
   file-docker:
     - docker compose -f ./compose-file.yaml up --build
 
-  # shop server tasks
+  # shop server tasks (shop is in rust and uses build.rs to build the proto gen)
   shop-docker:
     - docker compose -f ./compose-shop.yaml up --build
 
@@ -42,6 +40,6 @@ tasks:
     - protoc --go_out=./order/proto_gen/price --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/price --go-grpc_opt=paths=source_relative --proto_path=./proto_def/price ./proto_def/price/price.proto
     - protoc --go_out=./order/proto_gen/order --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/order --go-grpc_opt=paths=source_relative --proto_path=./proto_def/order ./proto_def/order/order.proto
 
-  order-dep-docker:
-    - docker compose -f compose-order.yaml up --build
+  order-docker:
+    - docker compose -f compose-order-dev.yaml up --build
 

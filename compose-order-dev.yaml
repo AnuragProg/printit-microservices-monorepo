@@ -1,0 +1,146 @@
+networks:
+    default: {}
+services:
+    auth-app:
+        build:
+            context: .
+            dockerfile: auth.Dockerfile
+        depends_on:
+            - auth-redis
+            - auth-postgres
+        environment:
+            - REST_HOST=0.0.0.0
+            - REST_PORT=3000
+            - GRPC_ADDR=0.0.0.0:50051
+            - PG_HOST=auth-postgres
+            - REDIS_URL=redis://auth-redis/0
+        networks:
+            - default
+        ports:
+            - 3000:3000
+            - 50051:50051
+        restart: always
+    auth-postgres:
+        environment:
+            POSTGRES_DB: printit
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+        image: postgres:16.2
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/authentication/pg:/var/lib/postgresql/data
+    auth-redis:
+        image: redis:7.2.4
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/authentication/redis:/data
+    file-app:
+        build:
+            context: .
+            dockerfile: file.Dockerfile
+        depends_on:
+            - auth-app
+            - file-mongo
+            - file-minio
+        environment:
+            - MONGO_URI=mongodb://file-mongo:27017/printit
+            - AUTH_GRPC_URI=auth-app:50051
+            - REST_PORT=3001
+            - GRPC_PORT=50052
+            - MINIO_URI=file-minio:9000
+            - MINIO_SERVER_ACCESS_KEY=minio-access-key
+            - MINIO_SERVER_SECRET_KEY=minio-secret-key
+        networks:
+            - default
+        ports:
+            - 3001:3001
+            - 50052:50052
+        restart: always
+    file-minio:
+        environment:
+            - MINIO_ROOT_USER=minio-access-key
+            - MINIO_ROOT_PASSWORD=minio-secret-key
+        image: bitnami/minio:2024.2.26
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/file/minio:/bitnami/minio/data
+    file-mongo:
+        image: mongo:7.0
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/file/mongo:/data/db
+    order-mongo:
+        image: mongo:7.0
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/order/mongo:/data/db
+    price-app:
+        build:
+            context: .
+            dockerfile: price.Dockerfile
+        depends_on:
+            - auth-app
+            - shop-app
+            - price-postgres
+        environment:
+            - REST_HOST=0.0.0.0
+            - REST_PORT=3003
+            - GRPC_ADDR=0.0.0.0:50054
+            - PG_HOST=price-postgres
+            - AUTH_GRPC_URI=auth-app:50051
+            - SHOP_GRPC_URI=shop-app:50053
+        networks:
+            - default
+        ports:
+            - 3003:3003
+            - 50054:50054
+        restart: always
+    price-postgres:
+        environment:
+            POSTGRES_DB: printit
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+        image: postgres:16.2
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/price/pg:/var/lib/postgresql/data
+    shop-app:
+        build:
+            context: .
+            dockerfile: shop.Dockerfile
+        depends_on:
+            - auth-app
+            - shop-mongo
+        environment:
+            - REST_PORT=3002
+            - GRPC_PORT=50053
+            - AUTH_GRPC_URI=http://auth-app:50051
+            - MONGO_URI=mongodb://shop-mongo/?maxPoolSize=100
+        networks:
+            - default
+        ports:
+            - 3002:3002
+            - 50053:50053
+        restart: always
+    shop-mongo:
+        image: mongo:7.0
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/shop/mongo:/data/db
+        ports:
+            - "27017:27017"
+version: "3"

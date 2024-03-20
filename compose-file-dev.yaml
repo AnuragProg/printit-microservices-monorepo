@@ -1,0 +1,61 @@
+networks:
+    default: {}
+services:
+    auth-app:
+        build:
+            context: .
+            dockerfile: auth.Dockerfile
+        depends_on:
+            - auth-redis
+            - auth-postgres
+        environment:
+            - REST_HOST=0.0.0.0
+            - REST_PORT=3000
+            - GRPC_ADDR=0.0.0.0:50051
+            - PG_HOST=auth-postgres
+            - REDIS_URL=redis://auth-redis/0
+        networks:
+            - default
+        ports:
+            - 3000:3000
+            - 50051:50051
+        restart: always
+    auth-postgres:
+        environment:
+            POSTGRES_DB: printit
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+        image: postgres:16.2
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/authentication/pg:/var/lib/postgresql/data
+    auth-redis:
+        image: redis:7.2.4
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/authentication/redis:/data
+    file-minio:
+        environment:
+            - MINIO_ROOT_USER=minio-access-key
+            - MINIO_ROOT_PASSWORD=minio-secret-key
+        image: bitnami/minio:2024.2.26
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/file/minio:/bitnami/minio/data
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+    file-mongo:
+        image: mongo:7.0
+        networks:
+            - default
+        restart: always
+        volumes:
+            - ./docker/file/mongo:/data/db
+version: "3"
