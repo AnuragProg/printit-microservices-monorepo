@@ -67,7 +67,7 @@ func GetCreateOrderHandler(
 			shopInfo.GetXId(),
 			priceInfo.GetXId(),
 			userInfo.GetXId(),
-			data.ORDER_PLACED,
+			string(data.ORDER_PLACED),
 		)
 		if err != nil{
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())

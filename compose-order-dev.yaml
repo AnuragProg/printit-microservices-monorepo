@@ -84,6 +84,8 @@ services:
         restart: always
         volumes:
             - ./docker/order/mongo:/data/db
+        ports:
+            - "27017:27017"
     price-app:
         build:
             context: .
@@ -141,6 +143,4 @@ services:
         restart: always
         volumes:
             - ./docker/shop/mongo:/data/db
-        ports:
-            - "27017:27017"
 version: "3"

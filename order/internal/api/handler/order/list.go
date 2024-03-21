@@ -54,7 +54,17 @@ func GetListCustomerOrdersHandler(
 			return fiber.ErrInternalServerError
 		}
 
-		c.JSON(struct{Orders []data.Order `json:"orders"`}{Orders: userOrders})
+		c.JSON(
+			struct{
+				Page int `json:"page"`
+				PageSize int `json:"pageSize"`
+				Orders []data.Order `json:"orders"`
+			}{
+				Page: page+1,
+				PageSize: pageSize,
+				Orders: userOrders,
+			},
+		)
 
 		return nil
 	}
@@ -93,7 +103,17 @@ func GetListShopkeeperOrdersHandler(orderCol *mongo.Collection) fiber.Handler{
 			return fiber.ErrInternalServerError
 		}
 
-		c.JSON(struct{Orders []data.Order `json:"orders"`}{Orders: shopOrders})
+		c.JSON(
+			struct{
+				Page int `json:"page"`
+				PageSize int `json:"pageSize"`
+				Orders []data.Order `json:"orders"`
+			}{
+				Page: page+1,
+				PageSize: pageSize,
+				Orders: shopOrders,
+			},
+		)
 
 		return nil
 	}

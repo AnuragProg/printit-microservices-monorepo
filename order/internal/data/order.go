@@ -7,14 +7,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type OrderStatus string
 
 const (
-	ORDER_PLACED = "placed"
-	ORDER_CANCELLED= "cancelled"
-	ORDER_ACCEPTED = "accepted"
-	ORDER_REJECTED = "rejected"
-	ORDER_PROCESSING = "processing"
-	ORDER_COMPLETED = "completed"
+	ORDER_PLACED		OrderStatus = "placed"
+	ORDER_CANCELLED	OrderStatus = "cancelled"
+	ORDER_ACCEPTED		OrderStatus = "accepted"
+	ORDER_REJECTED		OrderStatus = "rejected"
+	ORDER_PROCESSING	OrderStatus = "processing"
+	ORDER_COMPLETED	OrderStatus = "completed"
 )
 
 type Order struct {
@@ -28,27 +29,21 @@ type Order struct {
 	UpdatedAt		time.Time `bson:"updated_at" json:"-"`
 }
 
-func IsStatusValid(status string) error {
-	validStatuses := []string{ORDER_PLACED, ORDER_CANCELLED, ORDER_ACCEPTED, ORDER_REJECTED, ORDER_PROCESSING, ORDER_COMPLETED}
-	isValid := false
+func GetStatusEnum(status string) (*OrderStatus, error) {
+	validStatuses := []OrderStatus{ORDER_PLACED, ORDER_CANCELLED, ORDER_ACCEPTED, ORDER_REJECTED, ORDER_PROCESSING, ORDER_COMPLETED}
 
 	for _, validStatus := range validStatuses {
-		if validStatus == status {
-			isValid = true
-			break
+		if string(validStatus) == status {
+			return &validStatus, nil
 		}
 	}
-
-	if isValid {
-		return nil
-	}
-
-	return errors.New("invalid status")
+	return nil, errors.New("invalid status")
 }
 
 
 func CreateOrder(fileId, shopId, priceId, customerId, status string) (*Order, error) {
-	if err := IsStatusValid(status); err != nil{
+	statusEnum, err := GetStatusEnum(status)
+	if err != nil{
 		return nil, err
 	}
 	return &Order{
@@ -57,7 +52,7 @@ func CreateOrder(fileId, shopId, priceId, customerId, status string) (*Order, er
 		ShopId: shopId,
 		PriceId: priceId,
 		CustomerId: customerId,
-		Status: status,
+		Status: string(*statusEnum),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 	}, nil

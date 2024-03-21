@@ -4,12 +4,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	mid "github.com/AnuragProg/printit-microservices-monorepo/internal/middleware"
 	"github.com/AnuragProg/printit-microservices-monorepo/internal/api/handler/order"
+	"github.com/AnuragProg/printit-microservices-monorepo/internal/data"
+	mid "github.com/AnuragProg/printit-microservices-monorepo/internal/middleware"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
 	"github.com/AnuragProg/printit-microservices-monorepo/proto_gen/file"
-	"github.com/AnuragProg/printit-microservices-monorepo/proto_gen/shop"
 	"github.com/AnuragProg/printit-microservices-monorepo/proto_gen/price"
+	"github.com/AnuragProg/printit-microservices-monorepo/proto_gen/shop"
 )
 
 
@@ -64,7 +65,18 @@ func (or *OrderRoute)SetupRoutes() {
 		// complete order (shopkeeper) completed
 	(*or.Router).Patch(
 		"/shop/:shopId/orders/:orderId",
-		order.GetOrderActionHandler(or.OrderCol),
+		mid.GetAuthMiddleware(or.AuthGrpcClient),
+		order.GetOrderActionHandler(
+			or.OrderCol,
+			[]data.OrderStatus{
+				data.ORDER_CANCELLED,
+			}, //customer statuses
+			[]data.OrderStatus{
+				data.ORDER_ACCEPTED,
+				data.ORDER_REJECTED,
+				data.ORDER_COMPLETED,
+			}, //shopkeeper statuses
+		),
 	)
 
 	// list my orders (customer) GET

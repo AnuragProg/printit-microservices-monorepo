@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
 	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
+	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
 )
 
 func GetAuthMiddleware(authGrpcClient *auth.AuthenticationClient, userType ...auth.UserType) fiber.Handler {
