@@ -19,7 +19,7 @@ services:
         ports:
             - 3000:3000
             - 50051:50051
-        restart: always
+        restart: unless-stopped
     auth-postgres:
         environment:
             POSTGRES_DB: printit
@@ -28,14 +28,14 @@ services:
         image: postgres:16.2
         networks:
             - default
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./docker/authentication/pg:/var/lib/postgresql/data
     auth-redis:
         image: redis:7.2.4
         networks:
             - default
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./docker/authentication/redis:/data
     file-app:
@@ -59,7 +59,7 @@ services:
         ports:
             - 3001:3001
             - 50052:50052
-        restart: always
+        restart: unless-stopped
     file-minio:
         environment:
             - MINIO_ROOT_USER=minio-access-key
@@ -67,25 +67,32 @@ services:
         image: bitnami/minio:2024.2.26
         networks:
             - default
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./docker/file/minio:/bitnami/minio/data
     file-mongo:
         image: mongo:7.0
         networks:
             - default
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./docker/file/mongo:/data/db
+    kafka:
+        image: apache/kafka:3.7.0
+        networks:
+            - default
+        ports:
+            - 9092:9092
+        restart: unless-stopped
     order-mongo:
         image: mongo:7.0
         networks:
             - default
-        restart: always
+        restart: unless-stopped
+        ports:
+            - 27017:27017
         volumes:
             - ./docker/order/mongo:/data/db
-        ports:
-            - "27017:27017"
     price-app:
         build:
             context: .
@@ -106,7 +113,7 @@ services:
         ports:
             - 3003:3003
             - 50054:50054
-        restart: always
+        restart: unless-stopped
     price-postgres:
         environment:
             POSTGRES_DB: printit
@@ -115,7 +122,7 @@ services:
         image: postgres:16.2
         networks:
             - default
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./docker/price/pg:/var/lib/postgresql/data
     shop-app:
@@ -135,12 +142,12 @@ services:
         ports:
             - 3002:3002
             - 50053:50053
-        restart: always
+        restart: unless-stopped
     shop-mongo:
         image: mongo:7.0
         networks:
             - default
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./docker/shop/mongo:/data/db
 version: "3"

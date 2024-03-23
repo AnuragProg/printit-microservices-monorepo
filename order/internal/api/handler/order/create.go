@@ -5,6 +5,7 @@ import (
 
 	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
 	"github.com/AnuragProg/printit-microservices-monorepo/internal/data"
+	"github.com/AnuragProg/printit-microservices-monorepo/internal/client"
 
 	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
 	shop "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/shop"
@@ -24,6 +25,9 @@ type CreateOrderRequest struct {
 
 func GetCreateOrderHandler(
 	orderCol *mongo.Collection,
+
+	orderEventEmitter *client.OrderEventEmitter,
+
 	fileGrpcClient *file.FileClient,
 	shopGrpcClient *shop.ShopClient,
 	priceGrpcClient *price.PriceClient,
@@ -62,12 +66,14 @@ func GetCreateOrderHandler(
 			return fiber.NewError(fiber.StatusBadRequest, "invalid price id")
 		}
 
+		// store order on database
+		orderStatus := data.ORDER_PLACED
 		order, err := data.CreateOrder(
 			fileInfo.GetId(),
 			shopInfo.GetXId(),
 			priceInfo.GetXId(),
 			userInfo.GetXId(),
-			string(data.ORDER_PLACED),
+			string(orderStatus),
 		)
 		if err != nil{
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -76,6 +82,17 @@ func GetCreateOrderHandler(
 			log.Error(err.Error())
 			return fiber.ErrInternalServerError
 		}
+
+		// emit order event on kafka
+		orderEvent := client.OrderEvent{
+			ShopId: order.ShopId,
+			Status: orderStatus,
+		}
+		if err := orderEventEmitter.EmitOrderEvent(&orderEvent); err != nil {
+			log.Error(err.Error()) // will just show the error and not halt the order process as such
+		}
+
+		// respond to the user
 		c.JSON(struct{
 			Message	string `json:"message"`
 			Order		data.Order `json:"order"`

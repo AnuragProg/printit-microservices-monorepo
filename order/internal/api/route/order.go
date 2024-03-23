@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/AnuragProg/printit-microservices-monorepo/internal/api/handler/order"
+	"github.com/AnuragProg/printit-microservices-monorepo/internal/client"
 	"github.com/AnuragProg/printit-microservices-monorepo/internal/data"
 	mid "github.com/AnuragProg/printit-microservices-monorepo/internal/middleware"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
@@ -16,7 +17,14 @@ import (
 
 type OrderRoute struct {
 	Router *fiber.Router
+
+	// kafka emitters
+	OrderEventEmitter *client.OrderEventEmitter
+
+	// tables/collections
 	OrderCol *mongo.Collection
+
+	// grpc clients
 	AuthGrpcClient *auth.AuthenticationClient
 	FileGrpcClient *file.FileClient
 	ShopGrpcClient *shop.ShopClient
@@ -24,8 +32,9 @@ type OrderRoute struct {
 }
 
 
-func New(
+func NewOrderRoute(
 	router fiber.Router,
+	orderEventEmitter *client.OrderEventEmitter,
 	orderCol *mongo.Collection,
 	authGrpcClient *auth.AuthenticationClient,
 	fileGrpcClient *file.FileClient,
@@ -34,6 +43,7 @@ func New(
 ) *OrderRoute {
 	orderRoute := OrderRoute{
 		Router: &router,
+		OrderEventEmitter: orderEventEmitter,
 		OrderCol: orderCol,
 		AuthGrpcClient: authGrpcClient,
 		FileGrpcClient: fileGrpcClient,
@@ -52,6 +62,7 @@ func (or *OrderRoute)SetupRoutes() {
 		mid.GetAuthMiddleware(or.AuthGrpcClient, auth.UserType_CUSTOMER),
 		order.GetCreateOrderHandler(
 			or.OrderCol,
+			or.OrderEventEmitter,
 			or.FileGrpcClient,
 			or.ShopGrpcClient,
 			or.PriceGrpcClient,
@@ -68,6 +79,7 @@ func (or *OrderRoute)SetupRoutes() {
 		mid.GetAuthMiddleware(or.AuthGrpcClient),
 		order.GetOrderActionHandler(
 			or.OrderCol,
+			or.OrderEventEmitter,
 			[]data.OrderStatus{
 				data.ORDER_CANCELLED,
 			}, //customer statuses

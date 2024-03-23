@@ -38,6 +38,7 @@ var (
 	SHOP_GRPC_URI = util.GetenvOrDefault("SHOP_GRPC_URI", "localhost:50053")
 	PRICE_GRPC_URI = util.GetenvOrDefault("PRICE_GRPC_URI", "localhost:50054")
 
+	KAFKA_BROKER = util.GetenvOrDefault("KAFKA_BROKER", "localhost:9092")
 )
 
 
@@ -116,14 +117,20 @@ func main(){
 		panic(err.Error())
 	}
 
+	// kafka client
+	orderEventEmitter, err := client.NewOrderEventEmitter([]string{KAFKA_BROKER})
+	if err != nil{
+		panic(err.Error())
+	}
 
 	restApp := fiber.New(fiber.Config{
 		BodyLimit: 10 * 1024 * 1024, // 10 MB
 	})
 	defer restApp.ShutdownWithTimeout(10*time.Second)
 
-	_ = route.New(
+	_ = route.NewOrderRoute(
 		restApp.Group("/order"),
+		orderEventEmitter,
 		mongoDB.OrderCol,
 		&authGrpcClient,
 		&fileGrpcClient,

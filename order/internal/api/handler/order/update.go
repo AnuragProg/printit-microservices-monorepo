@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
+	"github.com/AnuragProg/printit-microservices-monorepo/internal/client"
 	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
 	"github.com/AnuragProg/printit-microservices-monorepo/internal/data"
 	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
@@ -17,6 +18,7 @@ import (
 
 func GetOrderActionHandler(
 	orderCol *mongo.Collection,
+	orderEventEmitter *client.OrderEventEmitter,
 	customerAllowedStatuses []data.OrderStatus,
 	shopkeeperAllowedStatuses []data.OrderStatus,
 ) fiber.Handler{
@@ -97,6 +99,15 @@ func GetOrderActionHandler(
 		default:
 			log.Warn("invalid request detected " + requestedStatus)
 			return fiber.NewError(fiber.StatusMethodNotAllowed, "requested status not allowed")
+		}
+
+		// log the order event to kafka
+		orderEvent := client.OrderEvent{
+			ShopId: orderInfo.ShopId,
+			Status: *requestedStatusEnum,
+		}
+		if err := orderEventEmitter.EmitOrderEvent(&orderEvent); err != nil {
+			log.Error(err.Error())
 		}
 
 		c.JSON(map[string]interface{}{
