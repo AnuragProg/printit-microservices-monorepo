@@ -184,6 +184,27 @@ services:
         networks:
             - default
 
+    # notification service
+    notification-app:
+        depends_on:
+            - order-app
+            - kafka
+
+    # live traffic service
+    live-traffic-app:
+        depends_on:
+            - live-traffic-redis
+            - order-app
+            - kafka
+
+    live-traffic-redis:
+        restart: unless-stopped
+        image: redis:7.2.4
+        volumes:
+            - ./docker/live-traffic/redis:/data
+        networks:
+            - default
+
     # for async processing
     kafka:
         restart: unless-stopped

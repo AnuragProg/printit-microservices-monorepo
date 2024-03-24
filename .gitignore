@@ -16,3 +16,7 @@ target/
 
 # nvim save files
 *~
+
+# notification & live-traffic services junk
+node_modules/
+dist/

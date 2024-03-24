@@ -3,43 +3,49 @@ version: '3'
 # context - root - printit-microservices-monorepo
 
 tasks:
-  docker:
-    - docker compose -f compose.yaml up --build
+    docker:
+        - docker compose -f compose.yaml up --build
 
-  # authentication server tasks
-  auth-docker:
-    - docker compose -f ./compose-auth-dev.yaml up --build
-  auth-proto-gen:
-    - python -m grpc_tools.protoc --proto_path=./proto_def/authentication --python_out=./authentication/src/proto_gen --pyi_out=./authentication/src/proto_gen --grpc_python_out=./authentication/src/proto_gen auth.proto
+    # authentication server tasks
+    auth-docker:
+        - docker compose -f ./compose-auth-dev.yaml up --build
+    auth-proto-gen:
+        - python -m grpc_tools.protoc --proto_path=./proto_def/authentication --python_out=./authentication/src/proto_gen --pyi_out=./authentication/src/proto_gen --grpc_python_out=./authentication/src/proto_gen auth.proto
 
-  # file server tasks
-  file-proto-gen:
-    - protoc --go_out=./file/proto_gen/authentication --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/authentication --go-grpc_opt=paths=source_relative --proto_path=./proto_def/authentication ./proto_def/authentication/auth.proto
-    - protoc --go_out=./file/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
-  file-docker:
-    - docker compose -f ./compose-file.yaml up --build
+    # file server tasks
+    file-proto-gen:
+        - protoc --go_out=./file/proto_gen/authentication --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/authentication --go-grpc_opt=paths=source_relative --proto_path=./proto_def/authentication ./proto_def/authentication/auth.proto
+        - protoc --go_out=./file/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
+    file-docker:
+        - docker compose -f ./compose-file.yaml up --build
 
-  # shop server tasks (shop is in rust and uses build.rs to build the proto gen)
-  shop-docker:
-    - docker compose -f ./compose-shop.yaml up --build
+    # shop server tasks (shop is in rust and uses build.rs to build the proto gen)
+    shop-docker:
+        - docker compose -f ./compose-shop.yaml up --build
 
-  # price server tasks
-  price-proto-gen:
-    - python -m grpc_tools.protoc --proto_path=./proto_def/authentication --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen auth.proto
-    - python -m grpc_tools.protoc --proto_path=./proto_def/file --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen file.proto
-    - python -m grpc_tools.protoc --proto_path=./proto_def/shop --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen shop.proto
-    - python -m grpc_tools.protoc --proto_path=./proto_def/price --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen price.proto
-  price-docker:
-    - docker compose -f compose-price-dev.yaml up --build
+    # price server tasks
+    price-proto-gen:
+        - python -m grpc_tools.protoc --proto_path=./proto_def/authentication --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen auth.proto
+        - python -m grpc_tools.protoc --proto_path=./proto_def/file --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen file.proto
+        - python -m grpc_tools.protoc --proto_path=./proto_def/shop --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen shop.proto
+        - python -m grpc_tools.protoc --proto_path=./proto_def/price --python_out=./price/src/proto_gen --pyi_out=./price/src/proto_gen --grpc_python_out=./price/src/proto_gen price.proto
+    price-docker:
+        - docker compose -f compose-price-dev.yaml up --build
 
-  # order server tasks
-  order-proto-gen:
-    - protoc --go_out=./order/proto_gen/authentication --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/authentication --go-grpc_opt=paths=source_relative --proto_path=./proto_def/authentication ./proto_def/authentication/auth.proto
-    - protoc --go_out=./order/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
-    - protoc --go_out=./order/proto_gen/shop --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/shop --go-grpc_opt=paths=source_relative --proto_path=./proto_def/shop ./proto_def/shop/shop.proto
-    - protoc --go_out=./order/proto_gen/price --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/price --go-grpc_opt=paths=source_relative --proto_path=./proto_def/price ./proto_def/price/price.proto
-    - protoc --go_out=./order/proto_gen/order --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/order --go-grpc_opt=paths=source_relative --proto_path=./proto_def/order ./proto_def/order/order.proto
+    # order server tasks
+    order-proto-gen:
+        - protoc --go_out=./order/proto_gen/authentication --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/authentication --go-grpc_opt=paths=source_relative --proto_path=./proto_def/authentication ./proto_def/authentication/auth.proto
+        - protoc --go_out=./order/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
+        - protoc --go_out=./order/proto_gen/shop --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/shop --go-grpc_opt=paths=source_relative --proto_path=./proto_def/shop ./proto_def/shop/shop.proto
+        - protoc --go_out=./order/proto_gen/price --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/price --go-grpc_opt=paths=source_relative --proto_path=./proto_def/price ./proto_def/price/price.proto
+        - protoc --go_out=./order/proto_gen/order --go_opt=paths=source_relative --go-grpc_out=./order/proto_gen/order --go-grpc_opt=paths=source_relative --proto_path=./proto_def/order ./proto_def/order/order.proto
 
-  order-docker:
-    - docker compose -f compose-order-dev.yaml up --build
+    order-docker:
+        - docker compose -f compose-order-dev.yaml up --build
+
+    # live-traffic
+    lt-docker:
+        - docker compose -f compose-live-traffic-dev.yaml up --build
+    lt-proto-gen:
+        - protoc --ts_out=./live-traffic/src/proto_gen/authentication --proto_path=./proto_def/authentication auth.proto
 
