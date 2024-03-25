@@ -1,3 +1,4 @@
+-- PURPOSE: TO DECREMENT TRAFFIC PREVENTING NEGATIVE VALUES
 -- requires key[shop_id]
 
 
@@ -11,9 +12,10 @@ end
 
 curShopTraffic = tonumber(curShopTraffic)
 
--- not an integer
-if curShopTraffic == nil then
+-- not an integer and value should be greater than 0
+if curShopTraffic == nil or curShopTraffic <= 0 then
 	return nil
 end
 
-return redis.call('INCR', shopId)
+return redis.call('DECR', shopId)
+

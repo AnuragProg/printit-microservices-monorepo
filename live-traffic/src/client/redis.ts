@@ -1,6 +1,5 @@
 import { createClient } from 'redis';
-import fs from 'fs';
-import path from 'path';
+import loadLuaScript from '../utils/load-lua-scripts';
 
 
 const REDIS_URI = process.env.REDIS_URI || "redis://localhost:6379";
@@ -29,21 +28,35 @@ class RedisClient {
 
 	luaScripts: {
 		decrShopTrafficScript: string,
+		incrShopTrafficScript: string,
 	};
 
 	constructor(){
 		this.luaScripts = {
-			decrShopTrafficScript: fs.readFileSync(
-				path.join(__dirname, '../redis-lua-scripts', 'decr_shop_traffic.lua'),
-				'utf8'
-			).toString(),
+			decrShopTrafficScript: loadLuaScript('decr_shop_traffic.lua'),
+			incrShopTrafficScript: loadLuaScript('incr_shop_traffic.lua'),
 		};
 		console.log(`loaded lua scripts = ${JSON.stringify(this.luaScripts)}`);
 	}
 
+	/*
+	================= INTERNAL CONVERSION(START) ===================
+	*/
 	private shopIdToRedisKey(shopId: string): string{
 		return this.SHOP_TRAFFIC_PREFIX + shopId;
 	}
+
+	private convertTrafficEvalValue(traffic: string): null | number{
+		if(typeof traffic === 'number'){
+			return traffic;
+		}else if(typeof traffic === 'string' && !isNaN(+traffic)){
+			return parseInt(traffic);
+		}
+		return null;
+	}
+	/*
+	================= INTERNAL CONVERSION(END) ===================
+	*/
 
 	async setShopTraffic(shopId: string, traffic: number): Promise<void>{
 		await client.set(this.shopIdToRedisKey(shopId), traffic);
@@ -51,22 +64,19 @@ class RedisClient {
 
 	async getShopTraffic(shopId: string): Promise<number|null>{
 		const traffic = await client.get(this.shopIdToRedisKey(shopId));
-		if(!Number.isInteger(traffic)){
-			return null;
-		}
-		return Number.parseInt(traffic as string);
+		return this.convertTrafficEvalValue(traffic as string);
 	}
 
-	async incrShopTraffic(shopId: string): Promise<number>{
-		return await client.incr(this.shopIdToRedisKey(shopId));
+	async incrShopTraffic(shopId: string): Promise<number|null>{
+		const shopIdKey = this.shopIdToRedisKey(shopId);
+		const newTraffic = await client.eval(this.luaScripts.incrShopTrafficScript, {keys: [shopIdKey]});
+		return this.convertTrafficEvalValue(newTraffic as string);
 	}
 
 	async decrShopTraffic(shopId: string): Promise<number|null>{
-		const res = await client.eval(this.luaScripts.decrShopTrafficScript, {keys:[shopId]});
-		if (typeof res === 'number') {
-			return res;
-		}
-		return null;
+		const shopIdKey = this.shopIdToRedisKey(shopId);
+		const newTraffic = await client.eval(this.luaScripts.decrShopTrafficScript, {keys:[shopIdKey]});
+		return this.convertTrafficEvalValue(newTraffic as string);
 	}
 }
 

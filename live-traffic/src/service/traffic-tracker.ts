@@ -1,29 +1,6 @@
 
-const ORDER_EVENT_TOPIC = process.env.ORDER_EVENT_TOPIC || "order-events";
-const ORDER_CONSUMER_GROUP_ID = process.env.ORDER_CONSUMER_GROUP_ID || "printit";
-
-import kafkaClient from '../client/kafka';
 import redisClient from '../client/redis';
-import { z } from 'zod';
-
-
-
-//type OrderEvent struct {
-//	ShopId string `json:"shop_id"`
-//	Status data.OrderStatus `json:"status"`
-//}
-const OrderStatusEnum = z.enum([
-	"placed",
-	"cancelled",
-	"accepted",
-	"rejected",
-	"processing",
-	"completed"
-]);
-const OrderEventSchema = z.object({
-	shop_id: z.string(),
-	status: OrderStatusEnum,
-});
+import { OrderEvent } from '../model/kafka';
 
 /**,
 *	Keeps track of traffic by receiving order events from kafka
@@ -32,46 +9,35 @@ const OrderEventSchema = z.object({
 class TrafficTracker{
 
 	/**
-	 * connects to kafka for order events and listens to the events
-	 */
-	async setup(){
-		const consumer = kafkaClient.consumer({groupId: ORDER_CONSUMER_GROUP_ID});
-		await consumer.connect();
-		consumer.subscribe({topic: ORDER_EVENT_TOPIC});
-		consumer.run({
-			eachMessage: async ({topic, partition, message})=>{
-				console.log(`message received: type = ${typeof message.value}`);
-				console.log(`message received: value = ${message.value}`);
+	*	logic for deciding when to update and to update the traffic on a particular shop
+	*/
+	async updateTraffic(orderEvent: OrderEvent): Promise<number|null>{
+		// detect change
+		let change = 0;
+		switch(orderEvent.status){
+			case 'accepted':
+				change++;
+			break;
 
-				// payload parsing
-				const orderEventResult = OrderEventSchema.safeParse(message.value);
-				if(!orderEventResult.success){ // invalid/unknown schema
-					console.error(`not able to parse = ${orderEventResult.error}`);
-					return;
-				}
-				const orderEvent = orderEventResult.data;
+			case 'completed':
+				change--;
+			break;
+		}
+		if(change === 0){
+			// nothing to change or broadcast in case of no change
+			return null;
+		}
 
-				// handle traffic updation and broadcasting
-				let change = 0;
-				switch(orderEvent.status){
-					case 'accepted':
-					change++;
-					break;
-
-					case 'completed':
-					change--;
-					break;
-				}
-				if(change === 0){
-					// nothing to broadcast in case of no change
-					return;
-				}
-
-			}
-		});
+		let newTraffic : number | null = null;
+		if(change<0){ // decrease the traffic
+			newTraffic = await redisClient.decrShopTraffic(orderEvent.shop_id);
+		}else{
+			newTraffic = await redisClient.incrShopTraffic(orderEvent.shop_id);
+		}
+		return newTraffic;
 	}
 }
 
-export default new TrafficTracker();
+export default TrafficTracker;
 
 

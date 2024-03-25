@@ -1,7 +1,6 @@
 import { WebSocket } from '@fastify/websocket';
 
 
-// TODO: probably the user if were to submitted
 /**
 *
 *	This room is specifically for broadcasting shop traffic updates to connected user
@@ -16,13 +15,12 @@ class TrafficBroadcaster{
 		this.rooms = new Map();
 	}
 
-	addUser(shopId: string, user: WebSocket){
-		if(this.rooms.has(shopId)){
-			this.rooms.get(shopId)?.add(user)
-		}else{
-			const newUserSet = new Set<WebSocket>();
-			newUserSet.add(user);
-			this.rooms.set(shopId, newUserSet);
+	subscribeUser(user: WebSocket, shopIds: string[]){
+		for(const shopId of shopIds){
+			if(!this.rooms.has(shopId)){
+				this.rooms.set(shopId, new Set());
+			}
+			this.rooms.get(shopId)!.add(user);
 		}
 	}
 
@@ -35,12 +33,18 @@ class TrafficBroadcaster{
 		});
 	}
 
-	publishTrafficForShop(shopId: string, newTrafficCount: number){
+	unsubscribeUser(user: WebSocket, shopIds: string[]){
+		for(const shopId of shopIds){
+			this.rooms.get(shopId)?.delete(user);
+		}
+	}
+
+	broadcastTrafficForShop(shopId: string, trafficCount: number){
 		const users = this.rooms.get(shopId) ?? new Set();
 		for(const user of users){
 			const data = {
 				shopId,
-				newTrafficCount,
+				trafficCount,
 			};
 			user.send(JSON.stringify(data));
 		}
@@ -48,4 +52,4 @@ class TrafficBroadcaster{
 }
 
 
-export default new TrafficBroadcaster();
+export default TrafficBroadcaster;

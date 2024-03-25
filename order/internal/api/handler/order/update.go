@@ -1,6 +1,7 @@
 package order
 
 import (
+	"time"
 	"context"
 
 	"github.com/gofiber/fiber/v2"
@@ -213,6 +214,7 @@ func updateOrderStatus(
 	orderUpdate := bson.M{
 		"$set": bson.M{
 			"status": toStatus,
+			"updated_at": time.Now().UTC(),
 		},
 	}
 	res, err := orderCol.UpdateOne(context.Background(), orderFilter, orderUpdate)
