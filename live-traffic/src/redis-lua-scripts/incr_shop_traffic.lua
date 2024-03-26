@@ -1,20 +1,33 @@
--- PURPOSE: TO INCREMENT TRAFFIC ONLY WHEN TRAFFIC HAS ALREADY BEEN SET FOR THE SHOP
--- requires key[shop_id]
+local temp_key = KEYS[1]
+local perm_key = KEYS[2]
 
+redis.log(redis.LOG_DEBUG, 'temp_key = '..temp_key)
+redis.log(redis.LOG_DEBUG, 'perm_key = '..perm_key)
 
-local shopId = KEYS[1]
-local curShopTraffic = redis.call('GET', shopId)
+local temp_traffic = tonumber(redis.call('GET', temp_key))
+local perm_traffic = tonumber(redis.call('GET', perm_key))
 
--- no traffic is present (the shop traffic needs to be set explicitly)
-if curShopTraffic == nil then
-	return nil
+if perm_traffic == nil then
+	-- shop is not being tracked
+	if temp_traffic == nil then
+		-- temp is not created for storing temp traffic yet
+		redis.log(redis.LOG_WARNING, 'not tracking shop with temp_key = '..temp_key..' and perm_key = '..perm_key)
+		return redis.error_reply('UNTRACKED_TEMP_TRAFFIC')
+	end
+	redis.call('INCR', temp_key)
+	return redis.error_reply('UNTRACKED_PERM_TRAFFIC')
 end
 
-curShopTraffic = tonumber(curShopTraffic)
-
--- not an integer (shop traffic must be integer to be incremented)
-if curShopTraffic == nil then
-	return nil
+temp_traffic = temp_traffic or 0
+local new_traffic = perm_traffic + 1 + temp_traffic
+if new_traffic < 0 then
+	redis.log(redis.LOG_WARNING, 'negative traffic: encountered with value '..(new_traffic))
+	redis.log(redis.LOG_WARNING, 'negative traffic: deleting temp and perm shop traffic')
+	redis.call('DEL', temp_key, perm_key)
+	return redis.error_reply('INVALID_TRAFFIC')
 end
 
-return redis.call('INCR', shopId)
+redis.call('SET', perm_key, new_traffic)
+redis.call('DEL', temp_key)
+
+return new_traffic
