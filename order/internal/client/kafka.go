@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/lovoo/goka"
 	"github.com/lovoo/goka/codec"
 
@@ -42,5 +43,6 @@ func (oee *OrderEventEmitter) EmitOrderEvent(orderEvent *OrderEvent) error {
 	if err != nil{
 		return err
 	}
+	log.Infof("Emitting on kafka: msg = %v\n", orderEventJson);
 	return oee.emitterClient.EmitSync(consts.ORDER_EMITTER_GROUP_ID, orderEventJson)
 }

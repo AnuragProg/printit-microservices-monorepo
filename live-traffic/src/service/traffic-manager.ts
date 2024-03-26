@@ -8,6 +8,7 @@ import { KafkaMessage } from 'kafkajs';
 import { OrderEvent, OrderEventSchema } from '../model/kafka';
 import { WebSocket } from '@fastify/websocket';
 import { SubscriptionShopTrafficSchema } from '../model/socket';
+import jsonParse from '../utils/json-parse';
 
 
 
@@ -32,14 +33,15 @@ class TrafficManager{
 		// create a order event consumer
 		const consumer = kafkaClient.consumer({groupId: ORDER_CONSUMER_GROUP_ID});
 		await consumer.connect();
-		consumer.subscribe({topic: ORDER_EVENT_TOPIC});
-		consumer.run({
+		await consumer.subscribe({topic: ORDER_EVENT_TOPIC});
+		await consumer.run({
 			eachMessage: async ({topic, partition, message}: {topic: string, partition: number, message: KafkaMessage}) => {
 				console.log(`message received: type = ${typeof message.value}`);
 				console.log(`message received: value = ${message.value}`);
 
 				// payload parsing
-				const orderEventResult = OrderEventSchema.safeParse(message.value);
+				const rawData = jsonParse((message.value)?message.value.toString():"");
+				const orderEventResult = OrderEventSchema.safeParse(rawData);
 				if(!orderEventResult.success){ // invalid/unknown schema
 					console.error(`not able to parse = ${orderEventResult.error}`);
 					return;
@@ -55,9 +57,23 @@ class TrafficManager{
 	handleUserSocketConn(socket: WebSocket){
 
 		socket.on('message', message => {
-			const rawData = message.toString();
+			let rawDataRes = jsonParse(message.toString());
+			console.log(message.toString());
+			console.log(rawDataRes);
+
+			if(!rawDataRes){
+				socket.send(JSON.stringify({
+					errors: 'invalid json',
+				}));
+				return;
+			}
+
+			const rawData = rawDataRes;
 			let parseRes = SubscriptionShopTrafficSchema.safeParse(rawData);
 			if(!parseRes.success){
+				socket.send(JSON.stringify({
+					errors: parseRes.error.errors,
+				}));
 				return;
 			}
 			let successData = parseRes.data;
@@ -89,7 +105,7 @@ class TrafficManager{
 
 const trafficManager = new TrafficManager();
 trafficManager.setup()
-.then(()=> console.log())
+.then(()=> console.log('traffic manager setup successful'))
 .catch(e=> { console.error(e); process.exit(1); });
 
 

@@ -122,6 +122,7 @@ func main(){
 	if err != nil{
 		panic(err.Error())
 	}
+	log.Infof("Created Kafka emitter at %v\n", KAFKA_BROKER)
 
 	restApp := fiber.New(fiber.Config{
 		BodyLimit: 10 * 1024 * 1024, // 10 MB

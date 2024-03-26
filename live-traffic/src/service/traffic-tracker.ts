@@ -8,8 +8,10 @@ import { OrderEvent } from '../model/kafka';
 */
 class TrafficTracker{
 
+
 	/**
 	*	logic for deciding when to update and to update the traffic on a particular shop
+	*
 	*/
 	async updateTraffic(orderEvent: OrderEvent): Promise<number|null>{
 		// detect change

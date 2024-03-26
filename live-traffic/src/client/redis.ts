@@ -21,7 +21,7 @@ client.connect()
 class RedisClient {
 
 	// TTL for shop traffic
-	TRAFFIC_TTL_SECS = 60*60*24 // 1 day
+	//TRAFFIC_TTL_SECS = 60*60*24 // 1 day
 
 	// PREFIXES
 	SHOP_TRAFFIC_PREFIX = "traffic:shop:";
@@ -67,12 +67,20 @@ class RedisClient {
 		return this.convertTrafficEvalValue(traffic as string);
 	}
 
+	/**
+	 *
+	 * increment only takes place when shop traffic is already present
+	 */
 	async incrShopTraffic(shopId: string): Promise<number|null>{
 		const shopIdKey = this.shopIdToRedisKey(shopId);
 		const newTraffic = await client.eval(this.luaScripts.incrShopTrafficScript, {keys: [shopIdKey]});
 		return this.convertTrafficEvalValue(newTraffic as string);
 	}
 
+	/**
+	*
+	* decrement only takes place when shop traffic is already present and is > 0
+	*/
 	async decrShopTraffic(shopId: string): Promise<number|null>{
 		const shopIdKey = this.shopIdToRedisKey(shopId);
 		const newTraffic = await client.eval(this.luaScripts.decrShopTrafficScript, {keys:[shopIdKey]});

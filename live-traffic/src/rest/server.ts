@@ -6,11 +6,11 @@ const rest = fastify();
 
 
 rest.register(fastifyWebsocket);
-
-rest.get('/live-traffic', { websocket: true } , async (socket, req)=>{
-	// TODO handler user authentication
-
-	trafficManager.handleUserSocketConn(socket);
+rest.register(async function(fastify){
+	fastify.get('/live-traffic', { websocket: true } , async (socket, req)=>{
+		// TODO handler user authentication
+		trafficManager.handleUserSocketConn(socket);
+	});
 });
 
 

@@ -15,28 +15,45 @@ class TrafficBroadcaster{
 		this.rooms = new Map();
 	}
 
-	subscribeUser(user: WebSocket, shopIds: string[]){
+	private printRooms(){
+		for(const [shopId, users] of this.rooms){
+			console.log(`${shopId} = ${users.size}`);
+		}
+	}
+
+	doesShophasAudience(shopId: string): boolean{
+		return this.rooms.has(shopId);
+	}
+
+	/**
+	* @returns {string[]} shops that are newly added
+	*/
+	subscribeUser(user: WebSocket, shopIds: string[]): string[]{
+		const addedShops : string[] = [];
 		for(const shopId of shopIds){
 			if(!this.rooms.has(shopId)){
+				addedShops.push(shopId);
 				this.rooms.set(shopId, new Set());
 			}
 			this.rooms.get(shopId)!.add(user);
 		}
+		this.printRooms();
+		return addedShops;
 	}
 
 	removeUser(user: WebSocket){
-		this.rooms.forEach((room, shopId)=>{
-			room.delete(user);
-			if(room.size == 0){
-				this.rooms.delete(shopId);
-			}
-		});
+		for(const [_, users] of this.rooms){
+			users.delete(user);
+		}
+		this.printRooms();
 	}
 
 	unsubscribeUser(user: WebSocket, shopIds: string[]){
 		for(const shopId of shopIds){
-			this.rooms.get(shopId)?.delete(user);
+			const set = this.rooms.get(shopId);
+			set?.delete(user);
 		}
+		this.printRooms();
 	}
 
 	broadcastTrafficForShop(shopId: string, trafficCount: number){

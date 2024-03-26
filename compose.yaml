@@ -178,9 +178,10 @@ services:
             - SHOP_GRPC_URI=shop-app:50053
             - PRICE_GRPC_URI=price-app:50054
             - MONGO_URI=mongodb://order-mongo/?maxPoolSize=100
+            - KAFKA_BROKER=kafka:9092
         ports:
-            - "3002:3002"
-            - "50053:50053"
+            - "3004:3004"
+            - "50055:50055"
         networks:
             - default
 
@@ -196,6 +197,9 @@ services:
             - live-traffic-redis
             - order-app
             - kafka
+        ports:
+            - "3005:3005"
+            - "50056:50056"
 
     live-traffic-redis:
         restart: unless-stopped
@@ -206,13 +210,31 @@ services:
             - default
 
     # for async processing
-    kafka:
-        restart: unless-stopped
-        image: apache/kafka:3.7.0
-        networks:
-            - default
+    zookeeper:
+        image: confluentinc/cp-zookeeper:7.6.0
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
         ports:
-            - "9092:9092"
+            - 22181:2181
+
+    kafka:
+        build:
+            context: .
+            dockerfile: kafka.Dockerfile
+        depends_on:
+            - zookeeper
+        ports:
+            - 29092:29092
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            TOPIC_NAME: order-events
+
 
 
 networks:
