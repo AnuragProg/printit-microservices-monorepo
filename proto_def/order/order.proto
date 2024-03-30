@@ -6,6 +6,18 @@ package order_grpc;
 
 message Empty{}
 
+
+message GetShopTrafficRequest{
+	string shop_id = 1;
+	string updated_on_or_before = 2; //rfc3339 notation timestamp
+}
+
+message GetShopTrafficResponse {
+	string shop_id = 1;
+	uint32 traffic = 2;
+}
+
 service Order{
 	rpc HealthCheck(Empty) returns (Empty);
+	rpc GetShopTraffic(GetShopTrafficRequest) returns (GetShopTrafficResponse);
 }

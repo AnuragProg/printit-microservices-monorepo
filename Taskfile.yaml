@@ -48,4 +48,5 @@ tasks:
         - docker compose -f compose-live-traffic-dev.yaml up --build
     lt-proto-gen:
         - protoc --ts_out=./live-traffic/src/proto_gen/authentication --proto_path=./proto_def/authentication auth.proto
+        - protoc --ts_out=./live-traffic/src/proto_gen/order --proto_path=./proto_def/order order.proto
 

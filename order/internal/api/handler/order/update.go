@@ -106,6 +106,7 @@ func GetOrderActionHandler(
 		orderEvent := client.OrderEvent{
 			ShopId: orderInfo.ShopId,
 			Status: *requestedStatusEnum,
+			UpdatedOnOrBefore: orderInfo.UpdatedAt.Format(time.RFC3339),
 		}
 		if err := orderEventEmitter.EmitOrderEvent(&orderEvent); err != nil {
 			log.Error(err.Error())

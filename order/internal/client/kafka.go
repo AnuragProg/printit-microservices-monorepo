@@ -33,6 +33,7 @@ func NewOrderEventEmitter(
 type OrderEvent struct {
 	ShopId string `json:"shop_id"`
 	Status data.OrderStatus `json:"status"`
+	UpdatedOnOrBefore string `json:"updated_on_or_before"`
 }
 
 func (oee *OrderEventEmitter) EmitOrderEvent(orderEvent *OrderEvent) error {

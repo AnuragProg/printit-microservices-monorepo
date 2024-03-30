@@ -38,20 +38,19 @@ class RedisClient {
 	 */
 	PERM_SHOP_TRAFFIC_PREFIX = this.SHOP_TRAFFIC_PREFIX;
 	TEMP_SHOP_TRAFFIC_PREFIX = this.TEMP_PREFIX + this.SHOP_TRAFFIC_PREFIX;
+	TEMP_SHOP_TRAFFIC_TIMESTAMP_PREFIX = this.TEMP_PREFIX + this.SHOP_TRAFFIC_PREFIX + "timestamp:";
 
 	luaScripts: {
-		decrShopTrafficScript: string,
-		incrShopTrafficScript: string,
-		setShopTrafficScript: string,
-		getShopTrafficScript: string,
+		changeShopTrafficLuaScript: string,
+		enableTempShopTrafficLuaScript: string,
+		setShopTrafficLuaScript: string,
 	};
 
 	constructor(){
 		this.luaScripts = {
-			decrShopTrafficScript: loadLuaScript('decr_shop_traffic.lua'),
-			incrShopTrafficScript: loadLuaScript('incr_shop_traffic.lua'),
-			setShopTrafficScript: loadLuaScript('set_shop_traffic.lua'),
-			getShopTrafficScript: loadLuaScript('get_shop_traffic.lua'),
+			changeShopTrafficLuaScript: loadLuaScript('change-shop-traffic.lua'),
+			enableTempShopTrafficLuaScript: loadLuaScript('enable-temp-shop-traffic.lua'),
+			setShopTrafficLuaScript: loadLuaScript('set-shop-traffic.lua'),
 		};
 		console.log(`loaded lua scripts = ${JSON.stringify(this.luaScripts)}`);
 	}
@@ -59,89 +58,104 @@ class RedisClient {
 	/*
 	================= INTERNAL CONVERSION(START) ===================
 	*/
-	private shopIdToRedisKey(shopId: string): string{
-		return this.SHOP_TRAFFIC_PREFIX + shopId;
+	private convertShopIdToPermTrafficKey(shopId: string){
+		const permTrafficKey = this.PERM_SHOP_TRAFFIC_PREFIX+shopId;
+		return permTrafficKey;
+	}
+	private convertShopIdToTempTrafficKey(shopId: string){
+		const tempTrafficKey = this.TEMP_SHOP_TRAFFIC_PREFIX+shopId;
+		return tempTrafficKey;
+	}
+	private convertShopIdToTempTrafficTimestampKey(shopId: string){
+		const tempTrafficTimestampKey = this.TEMP_SHOP_TRAFFIC_TIMESTAMP_PREFIX+shopId;
+		return tempTrafficTimestampKey;
 	}
 
-	private convertTrafficEvalValue(traffic: string): null | number{
-		if(typeof traffic === 'number'){
-			return traffic;
-		}else if(typeof traffic === 'string' && !isNaN(+traffic)){
-			return parseInt(traffic);
-		}
-		return null;
-	}
 	/*
 	================= INTERNAL CONVERSION(END) ===================
 	*/
 
-	/*
-	 *	UNTRACKED_PERM_TRAFFIC - untracked shop
-	 *	UNTRACKED_TEMP_TRAFFIC - untracked temp traffic
-	 *	meaning that neighter traffic is being tracked nor temp offset (best time to request for new traffic)
-	 *	INVALID_TRAFFIC - negative traffic count
-	 *
-	 */
 
-	async setShopTraffic(shopId: string, newTraffic: number): Promise<void>{
-		const permShopKey = this.PERM_SHOP_TRAFFIC_PREFIX + shopId;
-		await client.eval(
-			this.luaScripts.setShopTrafficScript,
+	/**
+	*	ERROR MESSGES FOR REDIS
+	*	-----------------------
+	*	NEGATIVE_TRAFFIC
+	*	TEMP_TRAFFIC_NOT_ENABLED
+	*	INVALID_ORDER_TIMESTAMP (should be epoch timestamp)
+	*	INVALID_TRAFFIC_CHANGE_OPERATION (traffic change should be 'incr' or 'decr')
+	*	TEMP_TRAFFIC_NOT_ENABLED (need for enabling temp traffic while the request for perm traffic is made to order service)
+	*	TRAFFIC_ADDED_TO_TEMP (current traffic added to temp and will be resolved when perm traffic is set during next read operation)
+	*/
+
+
+	async setShopTraffic(shopId: string, newTraffic: number): Promise<number|'NEGATIVE_TRAFFIC'>{
+		const permTrafficKey = this.convertShopIdToPermTrafficKey(shopId);
+		const tempTrafficKey = this.convertShopIdToTempTrafficKey(shopId);
+		const tempTrafficTimestampKey = this.convertShopIdToTempTrafficTimestampKey(shopId);
+		const res = await client.eval(
+			this.luaScripts.setShopTrafficLuaScript,
 			{
-				keys: [permShopKey],
+				keys: [permTrafficKey, tempTrafficKey, tempTrafficTimestampKey],
 				arguments: [newTraffic.toString()],
 			}
 		);
+		if(typeof res === 'number'){
+			return res;
+		}else if(res === 'NEGATIVE_TRAFFIC'){
+			return res;
+		}
+		throw new Error(`unknown status returned from redis: ${res}`);
+	}
+
+	async enableTempShopTraffic(shopId: string): Promise<number>{
+		const tempTrafficKey = this.convertShopIdToTempTrafficKey(shopId);
+		const tempTrafficTimestampKey = this.convertShopIdToTempTrafficTimestampKey(shopId);
+		return await client.eval(
+			this.luaScripts.enableTempShopTrafficLuaScript,
+			{
+				keys: [tempTrafficKey, tempTrafficTimestampKey]
+			}
+		) as number;
+	}
+
+	async changeShopTraffic(
+		change: 'incr' | 'decr',
+		shopId: string,
+		orderUpdateTimestamp: Date
+	){
+		const permTrafficKey = this.convertShopIdToPermTrafficKey(shopId);
+		const tempTrafficKey = this.convertShopIdToTempTrafficKey(shopId);
+		const tempTrafficTimestampKey = this.convertShopIdToTempTrafficTimestampKey(shopId);
+		const res = await client.eval(
+			this.luaScripts.changeShopTrafficLuaScript,
+			{
+				keys: [permTrafficKey, tempTrafficKey, tempTrafficTimestampKey],
+				arguments: [change, orderUpdateTimestamp.getTime().toString()],
+			}
+		);
+
+		if(typeof res === 'number'){
+			return res;
+		}else if(typeof res !== 'string'){
+			throw new Error("unknown result returned from changeShopTraffic update");
+		}
+
+		switch(res){
+			case 'INVALID_TRAFFIC_CHANGE_OPERATION': // neither incr nor decr
+			case 'INVALID_ORDER_TIMESTAMP': // should be timestamp
+			case 'NEGATIVE_TRAFFIC': // all the things are reset after this point
+			case 'TEMP_TRAFFIC_NOT_ENABLED': // temp traffic needs to be enabled to track the order before executing get traffic query
+			case 'TEMP_TRAFFIC_TIMESTAMP_NOT_SET': // temp traffic timestamp needs to be set along with temp_traffic
+			case 'ORDER_NOT_ADDED_TO_TEMP': // order traffic will be included in the query to the order service
+			case 'TRAFFIC_ADDED_TO_TEMP': // traffic is successfully offsetted in temp-order
+				return res;
+			default:
+				throw new Error("unhandled error from redis change shop traffic");
+		}
 	}
 
 	async getShopTraffic(shopId: string): Promise<number|null>{
-		try{
-			const tempShopKey = this.TEMP_SHOP_TRAFFIC_PREFIX + shopId;
-			const permShopKey = this.PERM_SHOP_TRAFFIC_PREFIX + shopId;
-			const traffic = await client.eval(
-				this.luaScripts.getShopTrafficScript,
-				{
-					keys: [tempShopKey, permShopKey],
-				}
-			);
-			if(typeof traffic == 'number'){
-				return traffic;
-			}
-		}catch(e){
-			console.error(`Encountered error = ${e}`);
-		}
-		return null;
-	}
-
-
-	/**
-	 *
-	 * increment only takes place when shop traffic is already present
-	 * otherwise notify with null that shop is not there
-	 * and the increment
-	 */
-	async incrShopTraffic(shopId: string): Promise<number|null>{
 		throw new Error('not implemented yet');
-		try{
-			const newTraffic = await client.eval(this.luaScripts.incrShopTrafficScript, {keys: [shopIdKey]});
-			if(typeof newTraffic == 'number'){
-				return newTraffic;
-			}
-		}catch(e){
-			console.error(`Encountered error = ${e}`);
-		}
-		return null;
-	}
-
-	/**
-	*
-	* decrement only takes place when shop traffic is already present and is > 0
-	*/
-	async decrShopTraffic(shopId: string): Promise<number|null>{
-		throw new Error('not implemented yet');
-		const shopIdKey = this.shopIdToRedisKey(shopId);
-		const newTraffic = await client.eval(this.luaScripts.decrShopTrafficScript, {keys:[shopIdKey]});
-		return this.convertTrafficEvalValue(newTraffic as string);
 	}
 }
 

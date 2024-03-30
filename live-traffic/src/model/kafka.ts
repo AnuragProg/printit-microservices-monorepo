@@ -15,9 +15,13 @@ const OrderStatusEnum = z.enum([
 const OrderEventSchema = z.object({
 	shop_id: z.string(),
 	status: OrderStatusEnum,
+	updated_on_or_before: z.string().refine(rfc3999 => {
+		const date = new Date(rfc3999);
+		return !isNaN(date.getTime())
+	}, { message: 'Invalid rfc3999 date format' }).transform(confirmedRfc3999 => new Date(confirmedRfc3999))
 });
-type OrderEvent = z.infer<typeof OrderEventSchema>;
 
+type OrderEvent = z.infer<typeof OrderEventSchema>;
 
 export {
 	OrderEvent,

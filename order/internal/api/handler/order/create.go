@@ -2,15 +2,16 @@ package order
 
 import (
 	"context"
+	"time"
 
+	"github.com/AnuragProg/printit-microservices-monorepo/internal/client"
 	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
 	"github.com/AnuragProg/printit-microservices-monorepo/internal/data"
-	"github.com/AnuragProg/printit-microservices-monorepo/internal/client"
 
 	auth "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/authentication"
-	shop "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/shop"
 	file "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/file"
 	price "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/price"
+	shop "github.com/AnuragProg/printit-microservices-monorepo/proto_gen/shop"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
@@ -87,6 +88,7 @@ func GetCreateOrderHandler(
 		orderEvent := client.OrderEvent{
 			ShopId: order.ShopId,
 			Status: orderStatus,
+			UpdatedOnOrBefore: order.UpdatedAt.Format(time.RFC3339),
 		}
 		if err := orderEventEmitter.EmitOrderEvent(&orderEvent); err != nil {
 			log.Error(err.Error()) // will just show the error and not halt the order process as such

@@ -78,12 +78,21 @@ services:
         volumes:
             - ./docker/file/mongo:/data/db
     kafka:
-        image: apache/kafka:3.7.0
-        networks:
-            - default
+        build:
+            context: .
+            dockerfile: kafka.Dockerfile
+        depends_on:
+            - zookeeper
+        environment:
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+            KAFKA_BROKER_ID: 1
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            TOPIC_NAME: order-events
         ports:
-            - 9092:9092
-        restart: unless-stopped
+            - 29092:29092
     order-mongo:
         image: mongo:7.0
         networks:
@@ -150,4 +159,11 @@ services:
         restart: unless-stopped
         volumes:
             - ./docker/shop/mongo:/data/db
+    zookeeper:
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+        image: confluentinc/cp-zookeeper:7.6.0
+        ports:
+            - 22181:2181
 version: "3"

@@ -38,7 +38,7 @@ var (
 	SHOP_GRPC_URI = util.GetenvOrDefault("SHOP_GRPC_URI", "localhost:50053")
 	PRICE_GRPC_URI = util.GetenvOrDefault("PRICE_GRPC_URI", "localhost:50054")
 
-	KAFKA_BROKER = util.GetenvOrDefault("KAFKA_BROKER", "localhost:9092")
+	KAFKA_BROKER = util.GetenvOrDefault("KAFKA_BROKER", "localhost:29092")
 )
 
 
@@ -51,7 +51,7 @@ func main(){
 	}
 
 	grpcApp := grpc.NewServer()
-	pb.RegisterOrderServer(grpcApp, service.NewOrderService())
+	pb.RegisterOrderServer(grpcApp, service.NewOrderService(mongoDB.OrderCol))
 	go func(){
 		grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%v", GRPC_PORT))
 		if err != nil{
