@@ -7,9 +7,29 @@ import TrafficTracker from './traffic-tracker';
 import { KafkaMessage } from 'kafkajs';
 import { OrderEvent, OrderEventSchema } from '../model/kafka';
 import { WebSocket } from '@fastify/websocket';
-import { SubscriptionShopTrafficSchema } from '../model/socket';
+import { GetShopTraffic, GetShopTrafficSchema, SubscriptionShopTraffic, SubscriptionShopTrafficSchema } from '../model/socket';
 import jsonParse from '../utils/json-parse';
+import orderGrpcClient from '../client/order-grpc';
 
+enum SocketResponseResult{
+	ERROR = 'error',
+	SUCCESS = 'success',
+}
+
+function successJSON({action, payload}: {action: string, payload: any}): string{
+	return JSON.stringify({
+		result: SocketResponseResult.SUCCESS,
+		action,
+		payload
+	});
+}
+
+function errorJSON(message: string): string{
+	return JSON.stringify({
+		result: SocketResponseResult.ERROR,
+		reason: message
+	});
+}
 
 
 class TrafficManager{
@@ -19,7 +39,7 @@ class TrafficManager{
 
 	constructor(){
 		this.trafficBroadcaster = new TrafficBroadcaster();
-		this.trafficTracker = new TrafficTracker();
+		this.trafficTracker = new TrafficTracker(orderGrpcClient);
 	}
 
 	/**
@@ -54,6 +74,37 @@ class TrafficManager{
 		});
 	}
 
+	private async handleSubscriptionShopTrafficSocketMessage(socket: WebSocket, msg: SubscriptionShopTraffic){
+		switch(msg.action){
+			case 'subscribe':
+				const newlyAddedShops = this.trafficBroadcaster.subscribeUser(socket, msg.shopIds);
+				console.log(`newlyAddedShops = ${newlyAddedShops}`);
+				// get filtered list from these shops which are not in the hashmap yet but maybe in redis
+				// request for those shops traffic
+				const shopsWithTheirTraffic = await this.trafficTracker.startTrackingShops(newlyAddedShops);
+				for(let i=0; i<shopsWithTheirTraffic.length; i++){
+					if(!shopsWithTheirTraffic[i].traffic){
+						continue;
+					}
+					this.trafficBroadcaster.broadcastTrafficForShop(
+						shopsWithTheirTraffic[i].shopId,
+						shopsWithTheirTraffic[i].traffic!,
+					);
+				}
+			break;
+			case 'unsubscribe':
+				this.trafficBroadcaster.unsubscribeUser(socket, msg.shopIds);
+			break;
+		}
+	}
+	private async handleGetShopTrafficSocketMessage(socket: WebSocket, msg: GetShopTraffic){
+		const shopsWithTraffic = await this.trafficTracker.getShopsTraffic(msg.shopIds);
+		socket.send(successJSON({
+			action: msg.action,
+			payload: shopsWithTraffic,
+		}));
+	}
+
 	handleUserSocketConn(socket: WebSocket){
 
 		socket.on('message', message => {
@@ -62,30 +113,27 @@ class TrafficManager{
 			console.log(rawDataRes);
 
 			if(!rawDataRes){
-				socket.send(JSON.stringify({
-					errors: 'invalid json',
-				}));
+				socket.send(errorJSON('invalid json'));
 				return;
 			}
 
 			const rawData = rawDataRes;
-			let parseRes = SubscriptionShopTrafficSchema.safeParse(rawData);
-			if(!parseRes.success){
-				socket.send(JSON.stringify({
-					errors: parseRes.error.errors,
-				}));
-				return;
+			{
+				const parseRes = SubscriptionShopTrafficSchema.safeParse(rawData);
+				if(parseRes.success){
+					this.handleSubscriptionShopTrafficSocketMessage(socket, parseRes.data);
+					return;
+				}
 			}
-			let successData = parseRes.data;
-
-			switch(successData.action){
-				case 'subscribe':
-					this.trafficBroadcaster.subscribeUser(socket, successData.shopIds);
-					break;
-				case 'unsubscribe':
-					this.trafficBroadcaster.unsubscribeUser(socket, successData.shopIds);
-					break;
+			{
+				const parseRes = GetShopTrafficSchema.safeParse(rawData);
+				if(parseRes.success){
+					this.handleGetShopTrafficSocketMessage(socket, parseRes.data);
+					return;
+				}
 			}
+			socket.send(errorJSON('unknown message schema'));
+			return;
 		});
 
 		socket.on('close', ()=>{

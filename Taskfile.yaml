@@ -17,11 +17,11 @@ tasks:
         - protoc --go_out=./file/proto_gen/authentication --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/authentication --go-grpc_opt=paths=source_relative --proto_path=./proto_def/authentication ./proto_def/authentication/auth.proto
         - protoc --go_out=./file/proto_gen/file --go_opt=paths=source_relative --go-grpc_out=./file/proto_gen/file --go-grpc_opt=paths=source_relative --proto_path=./proto_def/file ./proto_def/file/file.proto
     file-docker:
-        - docker compose -f ./compose-file.yaml up --build
+        - docker compose -f ./compose-file-dev.yaml up --build
 
     # shop server tasks (shop is in rust and uses build.rs to build the proto gen)
     shop-docker:
-        - docker compose -f ./compose-shop.yaml up --build
+        - docker compose -f ./compose-shop-dev.yaml up --build
 
     # price server tasks
     price-proto-gen:

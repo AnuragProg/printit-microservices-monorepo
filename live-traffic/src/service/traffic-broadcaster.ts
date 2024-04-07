@@ -26,19 +26,19 @@ class TrafficBroadcaster{
 	}
 
 	/**
-	* @returns {string[]} shops that are newly added
+	* @returns {string[]} newlyAddedShops
 	*/
 	subscribeUser(user: WebSocket, shopIds: string[]): string[]{
-		const addedShops : string[] = [];
+		const newlyAddedShops : string[] = [];
 		for(const shopId of shopIds){
 			if(!this.rooms.has(shopId)){
-				addedShops.push(shopId);
+				newlyAddedShops.push(shopId);
 				this.rooms.set(shopId, new Set());
 			}
 			this.rooms.get(shopId)!.add(user);
 		}
 		this.printRooms();
-		return addedShops;
+		return newlyAddedShops;
 	}
 
 	removeUser(user: WebSocket){

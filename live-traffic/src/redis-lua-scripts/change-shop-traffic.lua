@@ -26,7 +26,6 @@ end
 local perm_traffic = tonumber(redis.call('GET', perm_traffic_key))
 local temp_traffic = tonumber(redis.call('GET', temp_traffic_key))
 
-
 ---@param traffic number
 local function is_traffic_valid(traffic)
 	return traffic >= 0
@@ -34,7 +33,6 @@ end
 
 if perm_traffic ~= nil then
 	-- perm traffic is set, apply the the traffic change and offset the temp traffic value
-
 	temp_traffic = temp_traffic or 0
 
 	local new_traffic = perm_traffic + traffic_change + temp_traffic
