@@ -81,15 +81,9 @@ class TrafficManager{
 				console.log(`newlyAddedShops = ${newlyAddedShops}`);
 				// get filtered list from these shops which are not in the hashmap yet but maybe in redis
 				// request for those shops traffic
-				const shopsWithTheirTraffic = await this.trafficTracker.startTrackingShops(newlyAddedShops);
-				for(let i=0; i<shopsWithTheirTraffic.length; i++){
-					if(!shopsWithTheirTraffic[i].traffic){
-						continue;
-					}
-					this.trafficBroadcaster.broadcastTrafficForShop(
-						shopsWithTheirTraffic[i].shopId,
-						shopsWithTheirTraffic[i].traffic!,
-					);
+				const shopsWithTraffic = await this.trafficTracker.startTrackingShops(newlyAddedShops);
+				for(const {shopId, traffic} of shopsWithTraffic){
+					this.trafficBroadcaster.broadcastTrafficForShop(shopId,traffic);
 				}
 			break;
 			case 'unsubscribe':

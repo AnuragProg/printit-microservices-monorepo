@@ -2,7 +2,6 @@ package order
 
 import (
 	"context"
-	"time"
 
 	"github.com/AnuragProg/printit-microservices-monorepo/internal/client"
 	consts "github.com/AnuragProg/printit-microservices-monorepo/internal/constant"
@@ -88,7 +87,7 @@ func GetCreateOrderHandler(
 		orderEvent := client.OrderEvent{
 			ShopId: order.ShopId,
 			Status: orderStatus,
-			UpdatedOnOrBefore: order.UpdatedAt.Format(time.RFC3339),
+			UpdatedOnOrBeforeEpochMS: order.UpdatedAt.UnixMilli(),
 		}
 		if err := orderEventEmitter.EmitOrderEvent(&orderEvent); err != nil {
 			log.Error(err.Error()) // will just show the error and not halt the order process as such

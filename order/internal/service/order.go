@@ -29,10 +29,10 @@ func (os *OrderService) HealthCheck(context.Context, *pb.Empty) (*pb.Empty, erro
 	return &pb.Empty{}, nil
 }
 func (os *OrderService) GetShopTraffic(ctx context.Context, req *pb.GetShopTrafficRequest) (*pb.GetShopTrafficResponse, error) {
-	timestamp, err := time.Parse(time.RFC3339, req.GetUpdatedOnOrBefore())
-	if err != nil{
-		return nil, status.Error(codes.InvalidArgument, "timestamp should be in rfc3339 format")
-	}
+	timestamp := time.UnixMilli(req.GetUpdatedOnOrBeforeEpochMs())
+	// if err != nil{
+	// 	return nil, status.Error(codes.InvalidArgument, "timestamp should be in rfc3339 format")
+	// }
 	if _, err := primitive.ObjectIDFromHex(req.GetShopId()); err != nil{ // because we are using mongo for shop as well
 		return nil, status.Error(codes.InvalidArgument, "invalid shop id")
 	}

@@ -18,7 +18,7 @@ local redis_time = redis.call('TIME')
 local secs = tonumber(redis_time[1])
 local milli = tonumber(redis_time[2])/1000 -- because redis_time[2] is in microseconds
 
-temp_traffic_timestamp = secs*1000 + milli -- epoch milliseconds
+temp_traffic_timestamp = math.floor(secs*1000 + milli) -- epoch milliseconds
 
 redis.call('SET', temp_traffic_key, 0)
 redis.call('SET', temp_traffic_timestamp_key, temp_traffic_timestamp)

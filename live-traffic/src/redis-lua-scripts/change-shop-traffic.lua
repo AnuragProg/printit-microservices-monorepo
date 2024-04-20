@@ -26,17 +26,12 @@ end
 local perm_traffic = tonumber(redis.call('GET', perm_traffic_key))
 local temp_traffic = tonumber(redis.call('GET', temp_traffic_key))
 
----@param traffic number
-local function is_traffic_valid(traffic)
-	return traffic >= 0
-end
-
 if perm_traffic ~= nil then
 	-- perm traffic is set, apply the the traffic change and offset the temp traffic value
 	temp_traffic = temp_traffic or 0
 
 	local new_traffic = perm_traffic + traffic_change + temp_traffic
-	if is_traffic_valid(new_traffic) then
+	if new_traffic >= 0 then
 		redis.call('SET', perm_traffic_key, new_traffic)
 		redis.call('DEL', temp_traffic_key, temp_traffic_timestamp_key)
 		return new_traffic

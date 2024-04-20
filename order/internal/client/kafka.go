@@ -33,13 +33,14 @@ func NewOrderEventEmitter(
 type OrderEvent struct {
 	ShopId string `json:"shop_id"`
 	Status data.OrderStatus `json:"status"`
-	UpdatedOnOrBefore string `json:"updated_on_or_before"`
+	UpdatedOnOrBeforeEpochMS int64 `json:"updated_on_or_before_epoch_ms"`
 }
 
 func (oee *OrderEventEmitter) EmitOrderEvent(orderEvent *OrderEvent) error {
 	if orderEvent == nil {
 		return errors.New("no order event found")
 	}
+	log.Infof("shopId = %v, status = %v, updatedonorbefore = %v" , orderEvent.ShopId, orderEvent.Status, orderEvent.UpdatedOnOrBeforeEpochMS)
 	orderEventJson, err := json.Marshal(orderEvent)
 	if err != nil{
 		return err

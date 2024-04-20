@@ -106,7 +106,7 @@ func GetOrderActionHandler(
 		orderEvent := client.OrderEvent{
 			ShopId: orderInfo.ShopId,
 			Status: *requestedStatusEnum,
-			UpdatedOnOrBefore: orderInfo.UpdatedAt.Format(time.RFC3339),
+			UpdatedOnOrBeforeEpochMS: orderInfo.UpdatedAt.UnixMilli(),
 		}
 		if err := orderEventEmitter.EmitOrderEvent(&orderEvent); err != nil {
 			log.Error(err.Error())
@@ -212,12 +212,14 @@ func updateOrderStatus(
 	toStatus		string,
 ) error {
 	orderFilter := bson.M{"_id": orderId, "status": fromStatus}
+	updatedAt := time.Now().UTC()
 	orderUpdate := bson.M{
 		"$set": bson.M{
 			"status": toStatus,
-			"updated_at": time.Now().UTC(),
+			"updated_at": updatedAt,
 		},
 	}
+	log.Infof("order id %v updated at %v", orderId.String(), updatedAt);
 	res, err := orderCol.UpdateOne(context.Background(), orderFilter, orderUpdate)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())

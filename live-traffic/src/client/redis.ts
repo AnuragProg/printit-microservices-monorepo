@@ -158,18 +158,25 @@ class RedisClient {
 	async enableTempShopTraffic(shopId: string): Promise<number>{
 		const tempTrafficKey = this.convertShopIdToTempTrafficKey(shopId);
 		const tempTrafficTimestampKey = this.convertShopIdToTempTrafficTimestampKey(shopId);
-		return await client.eval(
+		const enabledTempTimestamp = await client.eval(
 			this.luaScripts.enableTempShopTrafficLuaScript,
 			{
 				keys: [tempTrafficKey, tempTrafficTimestampKey]
 			}
-		) as number;
+		);
+		if(typeof enabledTempTimestamp === 'number'){
+			return enabledTempTimestamp;
+		}else if(typeof enabledTempTimestamp === 'string'){
+			return parseInt(enabledTempTimestamp);
+		}
+		console.log(JSON.stringify(enabledTempTimestamp) + ' with type ' + (typeof enabledTempTimestamp));
+		throw new Error('unknown value being returned from redis');
 	}
 
 	async changeShopTraffic(
 		change: 'incr' | 'decr',
 		shopId: string,
-		orderUpdateTimestamp: Date
+		orderUpdateTimestampMS: number,// epoch timestamp
 	){
 		const permTrafficKey = this.convertShopIdToPermTrafficKey(shopId);
 		const tempTrafficKey = this.convertShopIdToTempTrafficKey(shopId);
@@ -178,7 +185,7 @@ class RedisClient {
 			this.luaScripts.changeShopTrafficLuaScript,
 			{
 				keys: [permTrafficKey, tempTrafficKey, tempTrafficTimestampKey],
-				arguments: [change, orderUpdateTimestamp.getTime().toString()],
+				arguments: [change, orderUpdateTimestampMS.toString()],
 			}
 		);
 

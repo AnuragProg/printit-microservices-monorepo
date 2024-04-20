@@ -1,6 +1,6 @@
 import redisClient from '../client/redis';
 import { OrderEvent } from '../model/kafka';
-import orderGrpcClient, {OrderGrpcClient} from '../client/order-grpc';
+import {OrderGrpcClient} from '../client/order-grpc';
 import RequestInProgress from '../error/request-in-progress';
 
 class TrafficTracker{
@@ -10,8 +10,9 @@ class TrafficTracker{
 	/**
 	* initiates process of setting traffic of multiple shops
 	* handles the cases where the traffic is already set(ignoring in that case)
+	* @returns shopswiththeir traffic
 	*/
-	async startTrackingShops(shopIds: string[]){
+	async startTrackingShops(shopIds: string[]): Promise<{shopId: string;traffic: number;}[]>{
 		try{
 			const untrackedShopIds = await redisClient.getUntrackedShops(shopIds);
 			console.log(`untrackedShopIds = ${untrackedShopIds}`);
@@ -20,6 +21,9 @@ class TrafficTracker{
 				shopTrafficPromises.push(
 					(async()=>{
 						const traffic = await this.enableTempShopTrafficAndFetchAndSetNewTraffic(shopId)
+						if(!traffic){
+							throw new Error(`traffic not found for shopId({shopId})`);
+						}
 						return {
 							shopId,
 							traffic
@@ -27,9 +31,16 @@ class TrafficTracker{
 					})()
 				);
 			}
-			return await Promise.all(shopTrafficPromises);
+			const shopTrafficResults = await Promise.allSettled(shopTrafficPromises);
+			const shopsWithTraffic : {shopId: string;traffic: number}[] = [];
+			for(const shopTraffic of shopTrafficResults){
+				if(shopTraffic.status==='fulfilled'){
+					shopsWithTraffic.push(shopTraffic.value);
+				}
+			}
+			return shopsWithTraffic;
 		}catch(err){
-			console.error(err);
+			console.log(err);
 			if(err instanceof RequestInProgress){
 				// don't do anything as it will be fetched in the process it is being fetched
 			}
@@ -38,11 +49,15 @@ class TrafficTracker{
 		return [];
 	}
 
+	/**
+	* @returns {Promise<number|null>} traffic of the shop associated with given shopId, in case of failure, null is returned
+	*
+	*/
 	private async enableTempShopTrafficAndFetchAndSetNewTraffic(shopId: string): Promise<number|null>{
 		try{
 			const timestamp = await redisClient.enableTempShopTraffic(shopId);
 			console.log(`temp traffic timestamp for shop with shop id ${shopId} = ${timestamp}`);
-			const newTraffic = await this.orderGrpcClient.getShopTraffic(shopId, new Date(timestamp));
+			const newTraffic = await this.orderGrpcClient.getShopTraffic(shopId, timestamp);
 			console.log(`new traffic of shop ${shopId} = ${JSON.stringify(newTraffic)}`);
 			const res = await redisClient.setShopTraffic(shopId, newTraffic.traffic);
 			if(res === 'NEGATIVE_TRAFFIC'){
@@ -61,8 +76,15 @@ class TrafficTracker{
 		const getShopTrafficPromises : Promise<{shopId: string; traffic: number; } | null>[] = [];
 		for(const shopId of shopIds){
 			getShopTrafficPromises.push((async()=>{
-				const traffic = await redisClient.getShopTraffic(shopId);
-				if(traffic === null) return null;
+				// try getting shop traffic
+				let traffic = await redisClient.getShopTraffic(shopId);
+				if(traffic === null) {
+					// on failure try getting traffic from order service and then set traffic according to the offset and return
+					traffic = await this.enableTempShopTrafficAndFetchAndSetNewTraffic(shopId);
+				}
+				if(traffic === null){
+					return null;
+				}
 				return {
 					shopId,
 					traffic
@@ -97,7 +119,7 @@ class TrafficTracker{
 		let result = await redisClient.changeShopTraffic(
 			change,
 			orderEvent.shop_id,
-			orderEvent.updated_on_or_before,
+			orderEvent.updated_on_or_before_epoch_ms,
 		);
 
 		console.log(result);

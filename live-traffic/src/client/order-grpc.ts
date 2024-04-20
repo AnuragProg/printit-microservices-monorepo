@@ -23,7 +23,7 @@ class OrderGrpcClient {
 
 	getShopTraffic(
 		shopId: string,
-		updatedOnOrBefore: Date,
+		updatedOnOrBeforeEpochMS: number,
 	): Promise<{shopId: string, traffic: number}>{
 
 		if(this.activeShopTrafficRequests.has(shopId)){
@@ -32,7 +32,7 @@ class OrderGrpcClient {
 
 		const reqData = new order_grpc.GetShopTrafficRequest({
 			shop_id: shopId,
-			updated_on_or_before: updatedOnOrBefore.toISOString(),
+			updated_on_or_before_epoch_ms: updatedOnOrBeforeEpochMS,
 		});
 
 		// add to active requests

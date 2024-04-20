@@ -9,7 +9,7 @@ message Empty{}
 
 message GetShopTrafficRequest{
 	string shop_id = 1;
-	string updated_on_or_before = 2; //rfc3339 notation timestamp
+	int64 updated_on_or_before_epoch_ms = 2; //epoch timestamp
 }
 
 message GetShopTrafficResponse {
