@@ -186,20 +186,31 @@ services:
             - default
 
     # notification service
-    notification-app:
-        depends_on:
-            - order-app
-            - kafka
+    # notification-app:
+    #     depends_on:
+    #         - order-app
+    #         - kafka
 
     # live traffic service
     live-traffic-app:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: live-traffic.Dockerfile
         depends_on:
             - live-traffic-redis
             - order-app
             - kafka
+        environment:
+            - REST_PORT=3005
+            - GRPC_PORT=50056
+            - REDIS_URI=redis://live-traffic-redis:6379
+            - KAFKA_BROKER=kafka:9092
         ports:
             - "3005:3005"
             - "50056:50056"
+        networks:
+            - default
 
     live-traffic-redis:
         restart: unless-stopped

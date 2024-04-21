@@ -3,6 +3,8 @@ version: '3'
 # context - root - printit-microservices-monorepo
 
 tasks:
+    refresh-docker:
+        - docker compose -f compose.yaml up --detach --build
     docker:
         - docker compose -f compose.yaml up --build
 
