@@ -31,7 +31,9 @@ func NewOrderEventEmitter(
 }
 
 type OrderEvent struct {
+	OrderId string `json:"order_id"`
 	ShopId string `json:"shop_id"`
+	CustomerId string `json:"customer_id"`
 	Status data.OrderStatus `json:"status"`
 	UpdatedOnOrBeforeEpochMS int64 `json:"updated_on_or_before_epoch_ms"`
 }

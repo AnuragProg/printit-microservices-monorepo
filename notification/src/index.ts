@@ -13,7 +13,6 @@ import wss from './websocket/server';
 const REST_PORT = parseInt(process.env.REST_PORT || '3006');
 
 
-
 async function main(){
 
 	// setting up websocket server

@@ -104,7 +104,9 @@ func GetOrderActionHandler(
 
 		// log the order event to kafka
 		orderEvent := client.OrderEvent{
+			OrderId: orderInfo.Id.String(),
 			ShopId: orderInfo.ShopId,
+			CustomerId: orderInfo.CustomerId,
 			Status: *requestedStatusEnum,
 			UpdatedOnOrBeforeEpochMS: orderInfo.UpdatedAt.UnixMilli(),
 		}

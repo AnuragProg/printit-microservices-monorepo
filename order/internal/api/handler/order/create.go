@@ -85,7 +85,9 @@ func GetCreateOrderHandler(
 
 		// emit order event on kafka
 		orderEvent := client.OrderEvent{
+			OrderId: order.Id.String(),
 			ShopId: order.ShopId,
+			CustomerId: order.CustomerId,
 			Status: orderStatus,
 			UpdatedOnOrBeforeEpochMS: order.UpdatedAt.UnixMilli(),
 		}

@@ -220,6 +220,29 @@ services:
         networks:
             - default
 
+
+    notification-app:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: notification.Dockerfile
+        depends_on:
+            - order-app
+            - auth-app
+            - shop-app
+            - kafka
+        environment:
+            - REST_PORT=3005
+            - GRPC_PORT=50056
+            - REDIS_URI=redis://live-traffic-redis:6379
+            - KAFKA_BROKER=kafka:9092
+        ports:
+            - "3005:3005"
+            - "50056:50056"
+        networks:
+            - default
+
+
     # for async processing
     zookeeper:
         image: confluentinc/cp-zookeeper:7.6.0

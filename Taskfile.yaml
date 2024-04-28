@@ -52,3 +52,14 @@ tasks:
         - protoc --ts_out=./live-traffic/src/proto_gen/authentication --proto_path=./proto_def/authentication auth.proto
         - protoc --ts_out=./live-traffic/src/proto_gen/order --proto_path=./proto_def/order order.proto
 
+    # notification
+    # notification-docker:
+    #     - [command to execute docker compose for notification service]
+
+    notification-proto-gen:
+        - protoc --ts_out=./notification/src/proto_gen/authentication --proto_path=./proto_def/authentication auth.proto
+        - protoc --ts_out=./notification/src/proto_gen/order --proto_path=./proto_def/order order.proto
+        - protoc --ts_out=./notification/src/proto_gen/shop --proto_path=./proto_def/shop shop.proto
+
+
+
