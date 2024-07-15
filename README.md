@@ -26,6 +26,14 @@ Printit is a platform built in microservices architecture to streamline the prin
 # ⚙️  Setup
 
 1. 📬 Postman - Import postman collection
-
+    - ![Rest API Collection](./postman/rest_collection.json)
+    - GRPC - Import Grpc methods from .proto files in !(proto)[./proto]
+    - WebSocket
+        - Live Traffic
+            - url: localhost:3005/live-traffic
+            - message: ```{"action": "subscribe" /*unsubscribe*/ ,"shopIds": ["669277b6de7ae8cca804bf6d"] /* list of shop ids */}```
+        - Notification
+            - url: localhost:3005/live-traffic
+            - header: ```Authorization: Bearer <token>```
 
 2. 🐳 Docker ```docker compose up -f compose.yaml```

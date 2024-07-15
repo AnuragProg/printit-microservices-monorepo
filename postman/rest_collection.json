@@ -1,0 +1,1578 @@
+{
+	"info": {
+		"_postman_id": "89224e08-16ad-4208-8aba-419f610b7838",
+		"name": "printit apis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23149803"
+	},
+	"item": [
+		{
+			"name": "authentication",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"customer singh\",\r\n    \"email\": \"customer@gmail.com\",\r\n    \"password\": \"helloworld\",\r\n    \"user_type\": \"customer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth_base}}/user/signup",
+							"host": [
+								"{{auth_base}}"
+							],
+							"path": [
+								"user",
+								"signup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Signup",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"john doe\",\r\n    \"email\": \"example@gmail.com\",\r\n    \"password\": \"helloworld\",\r\n    \"user_type\": \"customer\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{auth_base}}/user/signup",
+									"host": [
+										"{{auth_base}}"
+									],
+									"path": [
+										"user",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Wed, 21 Feb 2024 14:11:36 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "35"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"OTP sent successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{auth_base}}/user/verify-otp/255016",
+							"host": [
+								"{{auth_base}}"
+							],
+							"path": [
+								"user",
+								"verify-otp",
+								"255016"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Verify OTP",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{auth_base}}/user/verify-otp/664846",
+									"host": [
+										"{{auth_base}}"
+									],
+									"path": [
+										"user",
+										"verify-otp",
+										"664846"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Wed, 21 Feb 2024 14:19:56 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "41"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User successfully signed up\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"customer@gmail.com\",\r\n    \"password\": \"helloworld\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth_base}}/user/login",
+							"host": [
+								"{{auth_base}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"example@gmail.com\",\r\n    \"password\": \"helloworld\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{auth_base}}/user/login",
+									"host": [
+										"{{auth_base}}"
+									],
+									"path": [
+										"user",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Wed, 21 Feb 2024 15:03:58 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "184"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Logged in successfully\",\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJkN2M5Y2IxNjdlN2Q0Yzc3ODlmYjIwZDAwMjkxZTgwOCJ9.uVxQWDU79muwQIoqhYTyvv5mQFBrm09ZD9W2d7R3uus\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"example@gmail.com\",\r\n    \"new_password\": \"new_pass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth_base}}/user/forgot-password",
+							"host": [
+								"{{auth_base}}"
+							],
+							"path": [
+								"user",
+								"forgot-password"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Forgot Password",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"example@gmail.com\",\r\n    \"new_password\": \"new_pass\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{auth_base}}/user/forgot-password",
+									"host": [
+										"{{auth_base}}"
+									],
+									"path": [
+										"user",
+										"forgot-password"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Wed, 21 Feb 2024 15:58:58 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "35"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"OTP sent successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "file",
+			"item": [
+				{
+					"name": "Upload File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customer_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/E:/DPR.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{file_base}}/file",
+							"host": [
+								"{{file_base}}"
+							],
+							"path": [
+								"file"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Upload File",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/F:/dummy.pdf"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{file_base}}/file",
+									"host": [
+										"{{file_base}}"
+									],
+									"path": [
+										"file"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 08 Mar 2024 18:09:15 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "231"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"file uploaded successfully\",\n    \"file_info\": {\n        \"id\": \"65eb544afb85167dfca2e6bd\",\n        \"user_id\": \"fb0b36b5526f426a8f9a407895e4c7a8\",\n        \"file_name\": \"dummy.pdf\",\n        \"bucket_name\": \"printit-files\",\n        \"size\": 13264,\n        \"content_type\": \"application/pdf\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Download file",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customer_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{file_base}}/file/66934fad4d7c5d56baa6ce4e",
+							"host": [
+								"{{file_base}}"
+							],
+							"path": [
+								"file",
+								"66934fad4d7c5d56baa6ce4e"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "shop",
+			"item": [
+				{
+					"name": "Get shop details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shopkeeper_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{shop_base}}/shop/669277b6de7ae8cca804bf6d",
+							"host": [
+								"{{shop_base}}"
+							],
+							"path": [
+								"shop",
+								"669277b6de7ae8cca804bf6d"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get shop details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{shop_base}}/shop/65e9eb81ad448f007ff8995a",
+									"host": [
+										"{{shop_base}}"
+									],
+									"path": [
+										"shop",
+										"65e9eb81ad448f007ff8995a"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "content-type",
+									"value": "application/json"
+								},
+								{
+									"key": "server",
+									"value": "Rocket"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "permissions-policy",
+									"value": "interest-cohort=()"
+								},
+								{
+									"key": "content-length",
+									"value": "285"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 12 Mar 2024 17:42:33 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"shop\": {\n        \"_id\": \"65e9eb81ad448f007ff8995a\",\n        \"user_id\": \"fb0b36b5526f426a8f9a407895e4c7a8\",\n        \"name\": \"myshop\",\n        \"contact\": \"9999999999\",\n        \"email\": \"hello@gmail.com\",\n        \"location\": {\n            \"type\": \"Point\",\n            \"coordinates\": [\n                5,\n                2\n            ]\n        },\n        \"created_at\": \"2024-03-07T16:29:53.608Z\",\n        \"updated_at\": \"2024-03-07T17:48:59.988Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create shop",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shopkeeper_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"myshop\",\r\n    \"contact\": \"9999999999\",\r\n    \"email\": \"hello@gmail.com\",\r\n    \"location\":  [3,2]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{shop_base}}/shop",
+							"host": [
+								"{{shop_base}}"
+							],
+							"path": [
+								"shop"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create shop",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"myshop\",\r\n    \"contact\": \"9999999999\",\r\n    \"email\": \"hello@gmail.com\",\r\n    \"location\":  [3,2]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{shop_base}}/shop",
+									"host": [
+										"{{shop_base}}"
+									],
+									"path": [
+										"shop"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "content-type",
+									"value": "application/json"
+								},
+								{
+									"key": "server",
+									"value": "Rocket"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "permissions-policy",
+									"value": "interest-cohort=()"
+								},
+								{
+									"key": "content-length",
+									"value": "323"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 12 Mar 2024 17:42:48 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"shop created successfully\",\n    \"shop\": {\n        \"_id\": \"65f094187595190eef14ae0d\",\n        \"user_id\": \"fb0b36b5526f426a8f9a407895e4c7a8\",\n        \"name\": \"myshop\",\n        \"contact\": \"9999999999\",\n        \"email\": \"hello@gmail.com\",\n        \"location\": {\n            \"type\": \"Point\",\n            \"coordinates\": [\n                3,\n                2\n            ]\n        },\n        \"created_at\": \"2024-03-12T17:42:48.016Z\",\n        \"updated_at\": \"2024-03-12T17:42:48.016Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update shop",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    //\"name\": \"myshareop\"//,\r\n    // \"contact\": \"9999999999\",\r\n    // \"email\": \"hello@gmail.com\",\r\n    \"location\":  [5,8]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{shop_base}}/shop/65f4395ef3a2452808b8d110",
+							"host": [
+								"{{shop_base}}"
+							],
+							"path": [
+								"shop",
+								"65f4395ef3a2452808b8d110"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update shop",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    //\"name\": \"myshareop\"//,\r\n    // \"contact\": \"9999999999\",\r\n    // \"email\": \"hello@gmail.com\",\r\n    \"location\":  [5,2]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{shop_base}}/shop/65f094187595190eef14ae0d",
+									"host": [
+										"{{shop_base}}"
+									],
+									"path": [
+										"shop",
+										"65f094187595190eef14ae0d"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "content-type",
+									"value": "application/json"
+								},
+								{
+									"key": "server",
+									"value": "Rocket"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "permissions-policy",
+									"value": "interest-cohort=()"
+								},
+								{
+									"key": "content-length",
+									"value": "328"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 12 Mar 2024 17:43:02 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"shop data updated successfully\",\n    \"shop\": {\n        \"_id\": \"65f094187595190eef14ae0d\",\n        \"user_id\": \"fb0b36b5526f426a8f9a407895e4c7a8\",\n        \"name\": \"myshop\",\n        \"contact\": \"9999999999\",\n        \"email\": \"hello@gmail.com\",\n        \"location\": {\n            \"type\": \"Point\",\n            \"coordinates\": [\n                5,\n                2\n            ]\n        },\n        \"created_at\": \"2024-03-12T17:42:48.016Z\",\n        \"updated_at\": \"2024-03-12T17:43:01.432Z\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "price",
+			"item": [
+				{
+					"name": "Create Price",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shopkeeper_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"single_sided_price\": 2.40,\r\n    \"double_sided_price\": 3,\r\n    \"color\": \"color\",\r\n    \"page_size\": \"A4\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{price_base}}/price/shop/669277b6de7ae8cca804bf6d/prices",
+							"host": [
+								"{{price_base}}"
+							],
+							"path": [
+								"price",
+								"shop",
+								"669277b6de7ae8cca804bf6d",
+								"prices"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Price",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"single_sided_price\": 1.40,\r\n    \"double_sided_price\": 2,\r\n    \"color\": \"black-white\",\r\n    \"page_size\": \"A4\"\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{price_base}}/price/shop/65ef52674f7c796d8ef2ceef/prices",
+									"host": [
+										"{{price_base}}"
+									],
+									"path": [
+										"price",
+										"shop",
+										"65ef52674f7c796d8ef2ceef",
+										"prices"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Mon, 11 Mar 2024 20:14:43 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "268"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"price successfully created\",\n    \"price\": {\n        \"_id\": \"a92ce0adc72643889b99229ed66fd833\",\n        \"shop_id\": \"65ef52674f7c796d8ef2ceef\",\n        \"shopkeeper_id\": \"fb0b36b5526f426a8f9a407895e4c7a8\",\n        \"color\": \"black-white\",\n        \"single_sided_price\": 1.4,\n        \"double_sided_price\": 2,\n        \"page_size\": \"A4\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Price",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"color\": \"color\",\r\n    \"single_sided_price\": 3.4\r\n    // \"double_sided_price\": 2.0,\r\n    // \"page_size\": \"A4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{price_base}}/price/shop/65ef52674f7c796d8ef2ceef/prices/a92ce0adc72643889b99229ed66fd833",
+							"host": [
+								"{{price_base}}"
+							],
+							"path": [
+								"price",
+								"shop",
+								"65ef52674f7c796d8ef2ceef",
+								"prices",
+								"a92ce0adc72643889b99229ed66fd833"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update Price",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"color\": \"color\"\r\n    // \"single_sided_price\": 1.4,\r\n    // \"double_sided_price\": 2.0,\r\n    // \"page_size\": \"A4\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{price_base}}/price/shop/65ef52674f7c796d8ef2ceef/prices/a92ce0adc72643889b99229ed66fd833",
+									"host": [
+										"{{price_base}}"
+									],
+									"path": [
+										"price",
+										"shop",
+										"65ef52674f7c796d8ef2ceef",
+										"prices",
+										"a92ce0adc72643889b99229ed66fd833"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Mon, 11 Mar 2024 20:22:41 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "40"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"price updated successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Prices of a shop",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shopkeeper_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{price_base}}/price/shop/669277b6de7ae8cca804bf6d/prices",
+							"host": [
+								"{{price_base}}"
+							],
+							"path": [
+								"price",
+								"shop",
+								"669277b6de7ae8cca804bf6d",
+								"prices"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Prices of a shop",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{price_base}}/price/shop/65ef52674f7c796d8ef2ceef/prices",
+									"host": [
+										"{{price_base}}"
+									],
+									"path": [
+										"price",
+										"shop",
+										"65ef52674f7c796d8ef2ceef",
+										"prices"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Mon, 11 Mar 2024 20:15:01 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "452"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"prices\": [\n        {\n            \"_id\": \"6fde512900144472b407dd87c64959cb\",\n            \"shop_id\": \"65ef52674f7c796d8ef2ceef\",\n            \"shopkeeper_id\": \"fb0b36b5526f426a8f9a407895e4c7a8\",\n            \"color\": \"black-white\",\n            \"single_sided_price\": 1.4,\n            \"double_sided_price\": 2,\n            \"page_size\": \"A4\"\n        },\n        {\n            \"_id\": \"a92ce0adc72643889b99229ed66fd833\",\n            \"shop_id\": \"65ef52674f7c796d8ef2ceef\",\n            \"shopkeeper_id\": \"fb0b36b5526f426a8f9a407895e4c7a8\",\n            \"color\": \"black-white\",\n            \"single_sided_price\": 1.4,\n            \"double_sided_price\": 2,\n            \"page_size\": \"A4\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Price",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shopkeeper_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{price_base}}/price/shop/65ef52674f7c796d8ef2ceef/prices/6fde512900144472b407dd87c64959cb",
+							"host": [
+								"{{price_base}}"
+							],
+							"path": [
+								"price",
+								"shop",
+								"65ef52674f7c796d8ef2ceef",
+								"prices",
+								"6fde512900144472b407dd87c64959cb"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Price",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{price_base}}/price/shop/65ef52674f7c796d8ef2ceef/prices/6fde512900144472b407dd87c64959cb",
+									"host": [
+										"{{price_base}}"
+									],
+									"path": [
+										"price",
+										"shop",
+										"65ef52674f7c796d8ef2ceef",
+										"prices",
+										"6fde512900144472b407dd87c64959cb"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Mon, 11 Mar 2024 20:16:56 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "229"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"price\": {\n        \"_id\": \"6fde512900144472b407dd87c64959cb\",\n        \"shop_id\": \"65ef52674f7c796d8ef2ceef\",\n        \"shopkeeper_id\": \"fb0b36b5526f426a8f9a407895e4c7a8\",\n        \"color\": \"black-white\",\n        \"single_sided_price\": 1.4,\n        \"double_sided_price\": 2,\n        \"page_size\": \"A4\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Price",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{price_base}}/price/shop/65ef52674f7c796d8ef2ceef/prices/6fde512900144472b407dd87c64959cb",
+							"host": [
+								"{{price_base}}"
+							],
+							"path": [
+								"price",
+								"shop",
+								"65ef52674f7c796d8ef2ceef",
+								"prices",
+								"6fde512900144472b407dd87c64959cb"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Delete Price",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{price_base}}/price/shop/65ef52674f7c796d8ef2ceef/prices/6fde512900144472b407dd87c64959cb",
+									"host": [
+										"{{price_base}}"
+									],
+									"path": [
+										"price",
+										"shop",
+										"65ef52674f7c796d8ef2ceef",
+										"prices",
+										"6fde512900144472b407dd87c64959cb"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Mon, 11 Mar 2024 20:17:39 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "40"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"price deleted successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "order",
+			"item": [
+				{
+					"name": "customer",
+					"item": [
+						{
+							"name": "Create order",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{customer_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"file_id\": \"66928a4b36c73e0e504dbfb2\",\r\n    \"price_id\": \"d6c9b78473984f60bc221852f832a470\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{order_base}}/order/shop/669277b6de7ae8cca804bf6d/orders",
+									"host": [
+										"{{order_base}}"
+									],
+									"path": [
+										"order",
+										"shop",
+										"669277b6de7ae8cca804bf6d",
+										"orders"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Create order",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"file_id\": \"65f6cb0001759efdcd6d193f\",\r\n    \"price_id\": \"1f31edb949cf47c383dba9bb100a1bab\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{order_base}}/order/shop/65f4395ef3a2452808b8d110/orders",
+											"host": [
+												"{{order_base}}"
+											],
+											"path": [
+												"order",
+												"shop",
+												"65f4395ef3a2452808b8d110",
+												"orders"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Wed, 20 Mar 2024 15:56:20 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "269"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"order placed successfully\",\n    \"order\": {\n        \"_id\": \"65fb07253fae0899e5e55191\",\n        \"file_id\": \"65f6cb0001759efdcd6d193f\",\n        \"shop_id\": \"65f4395ef3a2452808b8d110\",\n        \"price_Id\": \"1f31edb949cf47c383dba9bb100a1bab\",\n        \"customer_id\": \"c3b06bc25306464990704d21d7541fd4\",\n        \"status\": \"placed\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get my orders",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{customer_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{order_base}}/order",
+									"host": [
+										"{{order_base}}"
+									],
+									"path": [
+										"order"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "pageSize",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get my orders",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{order_base}}/order",
+											"host": [
+												"{{order_base}}"
+											],
+											"path": [
+												"order"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Wed, 20 Mar 2024 15:56:25 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "456"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"orders\": [\n        {\n            \"_id\": \"65fb00926e56af9c1719793d\",\n            \"file_id\": \"65f6cb0001759efdcd6d193f\",\n            \"shop_id\": \"65f4395ef3a2452808b8d110\",\n            \"price_Id\": \"1f31edb949cf47c383dba9bb100a1bab\",\n            \"customer_id\": \"c3b06bc25306464990704d21d7541fd4\",\n            \"status\": \"placed\"\n        },\n        {\n            \"_id\": \"65fb07253fae0899e5e55191\",\n            \"file_id\": \"65f6cb0001759efdcd6d193f\",\n            \"shop_id\": \"65f4395ef3a2452808b8d110\",\n            \"price_Id\": \"1f31edb949cf47c383dba9bb100a1bab\",\n            \"customer_id\": \"c3b06bc25306464990704d21d7541fd4\",\n            \"status\": \"placed\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Cancel order",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{customer_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{order_base}}/order/shop/65f4395ef3a2452808b8d110/orders/65fc31a47f7fec4deb9bc983?status=cancelled",
+									"host": [
+										"{{order_base}}"
+									],
+									"path": [
+										"order",
+										"shop",
+										"65f4395ef3a2452808b8d110",
+										"orders",
+										"65fc31a47f7fec4deb9bc983"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "cancelled"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "shopkeeper",
+					"item": [
+						{
+							"name": "Get shop orders",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{shopkeeper_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{order_base}}/order/shop/669277b6de7ae8cca804bf6d/orders?page=1&pageSize=50",
+									"host": [
+										"{{order_base}}"
+									],
+									"path": [
+										"order",
+										"shop",
+										"669277b6de7ae8cca804bf6d",
+										"orders"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "50"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get shop orders",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{order_base}}/order/shop/65f4395ef3a2452808b8d110/orders?page=1&pageSize=10",
+											"host": [
+												"{{order_base}}"
+											],
+											"path": [
+												"order",
+												"shop",
+												"65f4395ef3a2452808b8d110",
+												"orders"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "pageSize",
+													"value": "10"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Wed, 20 Mar 2024 18:59:51 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "456"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"orders\": [\n        {\n            \"_id\": \"65fb00926e56af9c1719793d\",\n            \"file_id\": \"65f6cb0001759efdcd6d193f\",\n            \"shop_id\": \"65f4395ef3a2452808b8d110\",\n            \"price_Id\": \"1f31edb949cf47c383dba9bb100a1bab\",\n            \"customer_id\": \"c3b06bc25306464990704d21d7541fd4\",\n            \"status\": \"placed\"\n        },\n        {\n            \"_id\": \"65fb07253fae0899e5e55191\",\n            \"file_id\": \"65f6cb0001759efdcd6d193f\",\n            \"shop_id\": \"65f4395ef3a2452808b8d110\",\n            \"price_Id\": \"1f31edb949cf47c383dba9bb100a1bab\",\n            \"customer_id\": \"c3b06bc25306464990704d21d7541fd4\",\n            \"status\": \"placed\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Accept order",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{shopkeeper_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{order_base}}/order/shop/669277b6de7ae8cca804bf6d/orders/669350051b852c211ce61f06?status=accepted",
+									"host": [
+										"{{order_base}}"
+									],
+									"path": [
+										"order",
+										"shop",
+										"669277b6de7ae8cca804bf6d",
+										"orders",
+										"669350051b852c211ce61f06"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "accepted"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Complete order",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{shopkeeper_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{order_base}}/order/shop/669277b6de7ae8cca804bf6d/orders/6692a30d2df0c5219db1b97f?status=completed",
+									"host": [
+										"{{order_base}}"
+									],
+									"path": [
+										"order",
+										"shop",
+										"669277b6de7ae8cca804bf6d",
+										"orders",
+										"6692a30d2df0c5219db1b97f"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "completed"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "live-traffic",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{live_traffic_base}}/health-check",
+							"host": [
+								"{{live_traffic_base}}"
+							],
+							"path": [
+								"health-check"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "shopkeeper_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "customer_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "auth_base",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "file_base",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "shop_base",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "price_base",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "order_base",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "live_traffic_base",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
