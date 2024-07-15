@@ -33,7 +33,7 @@ Printit is a platform built in microservices architecture to streamline the prin
             - url: localhost:3005/live-traffic
             - message: ```{"action": "subscribe" /*unsubscribe*/ ,"shopIds": ["669277b6de7ae8cca804bf6d"] /* list of shop ids */}```
         - Notification
-            - url: localhost:3005/live-traffic
+            - url: localhost:3006/notification
             - header: ```Authorization: Bearer <token>```
 
 2. 🐳 Docker ```docker compose up -f compose.yaml```
