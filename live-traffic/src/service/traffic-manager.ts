@@ -1,5 +1,5 @@
 const ORDER_EVENT_TOPIC = process.env.ORDER_EVENT_TOPIC || "order-events";
-const ORDER_CONSUMER_GROUP_ID = process.env.ORDER_CONSUMER_GROUP_ID || "printit";
+const ORDER_CONSUMER_GROUP_ID = process.env.ORDER_CONSUMER_GROUP_ID || "printit-1";
 
 import kafkaClient from '../client/kafka';
 import TrafficBroadcaster from './traffic-broadcaster';

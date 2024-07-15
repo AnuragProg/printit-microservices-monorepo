@@ -14,6 +14,7 @@ class TrafficTracker{
 	*/
 	async startTrackingShops(shopIds: string[]): Promise<{shopId: string;traffic: number;}[]>{
 		try{
+            console.log('start tracking shops called');
 			const untrackedShopIds = await redisClient.getUntrackedShops(shopIds);
 			console.log(`untrackedShopIds = ${untrackedShopIds}`);
 			const shopTrafficPromises = [];
@@ -140,7 +141,7 @@ class TrafficTracker{
 				break;
 
 			case 'TEMP_TRAFFIC_NOT_ENABLED':
-				return this.enableTempShopTrafficAndFetchAndSetNewTraffic(orderEvent.shop_id);
+				return await this.enableTempShopTrafficAndFetchAndSetNewTraffic(orderEvent.shop_id);
 			case 'TRAFFIC_ADDED_TO_TEMP':
 				// TODO add check whether the request for the shop id is being done or not, if not then initiate request again
 				break;

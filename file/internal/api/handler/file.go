@@ -100,7 +100,6 @@ func GetDownloadFileHandler(
 			return fiber.NewError(fiber.StatusBadRequest, "invalid id param")
 		}
 
-
 		// get file metadata
 		metadataRes := mongoFileMetadataCol.FindOne(context.Background(), bson.M{"_id": fileId})
 		metadata := data.FileMetadata{}

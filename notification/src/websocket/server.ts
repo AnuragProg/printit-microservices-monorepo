@@ -1,5 +1,5 @@
 const ORDER_EVENT_TOPIC = process.env.ORDER_EVENT_TOPIC || "order-events";
-const ORDER_CONSUMER_GROUP_ID = process.env.ORDER_CONSUMER_GROUP_ID || "printit";
+const ORDER_CONSUMER_GROUP_ID = process.env.ORDER_CONSUMER_GROUP_ID || "printit-2";
 
 import {FastifyInstance, FastifyRequest} from 'fastify';
 import kafkaClient from '../client/kafka';
@@ -99,7 +99,10 @@ class WebsocketServer{
 		const consumer = kafkaClient.consumer({groupId: ORDER_CONSUMER_GROUP_ID});
 		await consumer.connect();
 		await consumer.subscribe({topic: ORDER_EVENT_TOPIC});
-		await consumer.run({eachMessage: this.consumeKafkaMessage.bind(this)});
+		// await consumer.run({eachMessage: this.consumeKafkaMessage.bind(this)});
+		await consumer.run({eachMessage: async({topic, partition, message}: {topic: string, partition: number, message: KafkaMessage})=>{
+            this.consumeKafkaMessage({topic, partition, message});
+        }});
 	}
 
 	private async consumeKafkaMessage({topic, partition, message}: {topic: string, partition: number, message: KafkaMessage}){

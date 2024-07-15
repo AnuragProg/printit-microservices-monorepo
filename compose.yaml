@@ -123,6 +123,7 @@ services:
         environment:
             - MINIO_ROOT_USER=minio-access-key
             - MINIO_ROOT_PASSWORD=minio-secret-key
+        user: root
         networks:
             - default
 
@@ -203,12 +204,13 @@ services:
             - kafka
         environment:
             - REST_PORT=3005
-            - GRPC_PORT=50056
+            # - GRPC_PORT=50056
+            - ORDER_GRPC_URI=order-app:50055
             - REDIS_URI=redis://live-traffic-redis:6379
             - KAFKA_BROKER=kafka:9092
         ports:
             - "3005:3005"
-            - "50056:50056"
+            # - "50056:50056"
         networks:
             - default
 
@@ -232,13 +234,15 @@ services:
             - shop-app
             - kafka
         environment:
-            - REST_PORT=3005
-            - GRPC_PORT=50056
-            - REDIS_URI=redis://live-traffic-redis:6379
+            - REST_PORT=3006
+            # - GRPC_PORT=50056
+            - AUTH_GRPC_URI=auth-app:50051
+            - ORDER_GRPC_URI=order-app:50055
+            - SHOP_GRPC_URI=shop-app:50053
             - KAFKA_BROKER=kafka:9092
         ports:
-            - "3005:3005"
-            - "50056:50056"
+            - "3006:3006"
+            # - "50056:50056"
         networks:
             - default
 
