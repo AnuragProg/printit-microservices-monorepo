@@ -27,7 +27,7 @@ Printit is a platform built in microservices architecture to streamline the prin
 
 1. 📬 Postman - Import postman collection
     - ![Rest API Collection](./postman/rest_collection.json)
-    - GRPC - Import Grpc methods from .proto files in !(proto)[./proto]
+    - GRPC - Import Grpc methods from .proto files in ![proto](./proto)
     - WebSocket
         - Live Traffic
             - url: localhost:3005/live-traffic
