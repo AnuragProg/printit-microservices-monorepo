@@ -5,8 +5,10 @@ WORKDIR /usr/app/file
 
 # installing protoc
 RUN apk add --no-cache protobuf
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+# RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+# RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 
 # copy mod and sum files
 COPY ./file/go.mod ./file/go.sum ./
